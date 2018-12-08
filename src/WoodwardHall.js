@@ -327,12 +327,12 @@ window.onload = function init() {
     program = initShaders(gl, "vertex-shader", "fragment-shader");
     gl.useProgram(program);
 
-    // createLeftRooms(4);
-    // createRightRooms(4);
+    createLeftRooms(4);
+    createRightRooms(4);
     createLab(4);
-    // createRestroom(4);
-    // cooridors(4);
-    // makeCeiling();
+    createRestroom(4);
+    cooridors(4);
+    makeCeiling();
     /*var cBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW);
