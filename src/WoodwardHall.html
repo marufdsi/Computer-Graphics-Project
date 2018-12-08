@@ -14,12 +14,12 @@ varying vec4 fColor;
 uniform mat4 modelView;
 uniform mat4 projection;
 
-void main() 
+void main()
 {
     //gl_Position = projection*vPosition;
     gl_Position = projection*modelView*vPosition;
     fColor = vColor;
-} 
+}
 
 </script>
 
@@ -45,6 +45,9 @@ main()
 <body>
 <div  style="text-align: center">
     <label style="font-size: 36px; font-weight: bold; color: brown">Woodward Hall CCI Faculty</label>
+    <br />
+    <label>WASD to move, ER to change speed, CZ to Crouch or Prone, SPACE to jump</label><br />
+    <label>Mouse click to view different angles, drag to change walking direction</label><br />
 </div>
 <div style="width:100%; text-align: center;">
     <canvas id="gl-canvas" width="1000" height="1000">
