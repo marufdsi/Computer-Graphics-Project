@@ -8,28 +8,28 @@ var pointsArray = [];
 var colorsArray = [];
 
 var leftCorridor = [
-    vec4(-150, 0, 450, 1.0),
-    vec4(-100, 0.0, 450, 1.0),
-    vec4(-150, 0.0, -400, 1.0),
-    vec4(-100, 0.0, -400, 1.0),
+    vec3(-150, 0, 450),
+    vec3(-100, 0.0, 450),
+    vec3(-150, 0.0, -400),
+    vec3(-100, 0.0, -400),
 ];
 var rightCorridor = [
-    vec4(150, 0.0, 450.0, 1.0),
-    vec4(100, 0.0, 450.0, 1.0),
-    vec4(150, 0.0, -400.0, 1.0),
-    vec4(100, 0.0, -400.0, 1.0),
+    vec3(150, 0.0, 450.0),
+    vec3(100, 0.0, 450.0),
+    vec3(150, 0.0, -400.0),
+    vec3(100, 0.0, -400.0),
 ];
 var frontCorridor = [
-    vec4(-100, 0.0, -400.0, 1.0),
-    vec4(100, 0.0, -400.0, 1.0),
-    vec4(-100, 0.0, -450.0, 1.0),
-    vec4(100, 0.0, -450.0, 1.0),
+    vec3(-100, 0.0, -400.0),
+    vec3(100, 0.0, -400.0),
+    vec3(-100, 0.0, -450.0),
+    vec3(100, 0.0, -450.0),
 ];
 var backCorridor = [
-    vec4(-100, 0.0, 400.0, 1.0),
-    vec4(100, 0.0, 400.0, 1.0),
-    vec4(-100, 0.0, 450.0, 1.0),
-    vec4(100, 0.0, 450.0, 1.0),
+    vec3(-100, 0.0, 400.0),
+    vec3(100, 0.0, 400.0),
+    vec3(-100, 0.0, 450.0),
+    vec3(100, 0.0, 450.0),
 ];
 var baseColor = vec4(0.4, 0.4, 0.8, 1.0);
 var corridorColor = vec4(0.5, 0.6, 0.2, 1.0);
@@ -75,6 +75,7 @@ var speed = 0.5;
 
 var normalsArray = [];
 var carpet = [];
+var doors = [];
 
 var lightSource = vec4(-205, 150.0, 300.0, 0.0);
 var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0);
@@ -105,34 +106,50 @@ var default_room_width = 100;
 
 function createRoom(start, length, width, height, dLWall, dRWall, dBWall, dFWall) {
     basement = [
-        vec4(start[0], 0.0, start[2] + length, start[3]),
-        vec4(start[0] + width, 0.0, start[2] + length, start[3]),
-        vec4(start[0], 0.0, start[2], start[3]),
-        vec4(start[0] + width, 0.0, start[2], start[3]),
+        vec3(start[0], 0.0, start[2] + length),
+        vec3(start[0] + width, 0.0, start[2] + length),
+        vec3(start[0], 0.0, start[2]),
+        vec3(start[0] + width, 0.0, start[2]),
     ];
     leftSide = [
-        vec4(start[0], height, start[2], start[3]),
-        vec4(start[0] + width, height, start[2], start[3]),
-        vec4(start[0], 0, start[2], start[3]),
-        vec4(start[0] + width, 0, start[2], start[3]),
+        vec3(start[0], height, start[2]),
+        vec3(start[0] + width, height, start[2]),
+        vec3(start[0], 0, start[2]),
+        vec3(start[0] + width, 0, start[2]),
     ];
     rightSide = [
-        vec4(start[0], height, start[2] + length, start[3]),
-        vec4(start[0] + width, height, start[2] + length, start[3]),
-        vec4(start[0], 0, start[2] + length, start[3]),
-        vec4(start[0] + width, 0, start[2] + length, start[3]),
+        vec3(start[0], height, start[2] + length),
+        vec3(start[0] + width, height, start[2] + length),
+        vec3(start[0], 0, start[2] + length),
+        vec3(start[0] + width, 0, start[2] + length),
     ];
     backSide = [
-        vec4(start[0], height, start[2], start[3]),
-        vec4(start[0], height, start[2] + length, start[3]),
-        vec4(start[0], 0, start[2], start[3]),
-        vec4(start[0], 0, start[2] + length, start[3]),
+        vec3(start[0], height, start[2]),
+        vec3(start[0], height, start[2] + length),
+        vec3(start[0], 0, start[2]),
+        vec3(start[0], 0, start[2] + length),
     ];
     frontSide = [
-        vec4(start[0] + width, height, start[2], start[3]),
-        vec4(start[0] + width, height, start[2] + length, start[3]),
-        vec4(start[0] + width, 0, start[2], start[3]),
-        vec4(start[0] + width, 0, start[2] + length, start[3]),
+        // left portion
+        vec3(start[0] + width, height, start[2]),
+        vec3(start[0] + width, height, start[2] + (length/3)),
+        vec3(start[0] + width, 0, start[2]),
+        vec3(start[0] + width, 0, start[2] + (length/3)),
+        // right portion
+        vec3(start[0] + width, height, start[2]+(2*length/3)),
+        vec3(start[0] + width, height, start[2] + length),
+        vec3(start[0] + width, 0, start[2]+(2*length/3)),
+        vec3(start[0] + width, 0, start[2] + length),
+        // upper portion of door
+        vec3(start[0] + width, height, start[2]+(length/3)),
+        vec3(start[0] + width, height, start[2] +(2*length/3)),
+        vec3(start[0] + width, (3*height/4), start[2]+(length/3)),
+        vec3(start[0] + width, (3*height/4), start[2]+(2*length/3)),
+        // door
+        vec3(start[0] + width, (3*height/4), start[2]+(length/3)),
+        vec3(start[0] + width, (3*height/4), start[2] + length),
+        vec3(start[0] + width, 0, start[2]+(length/3)),
+        vec3(start[0] + width, 0, start[2]+(2*length/3)),
     ];
     if (dLWall) {
         quad(leftSide, 2, 0, 1, 3, 0);
@@ -145,16 +162,27 @@ function createRoom(start, length, width, height, dLWall, dRWall, dBWall, dFWall
     }
     if (dFWall) {
         quad(frontSide, 2, 0, 1, 3, 0);
+        quad(frontSide, 6, 4, 5, 7, 0);
+        quad(frontSide, 10, 8, 9, 11, 0);
+        quad(frontSide, 14, 12, 13, 15, 2);
     }
     quad(basement, 2, 0, 1, 3, 1);
 }
 
+function convertToNDC(object) {
+    var result = [];
+    for (var i=0; i<object.length; i++) {
+        result.push(vec4((2 * object[i][0] / canvas.width) - 1, (2 * (canvas.height - object[i][1]) / canvas.height) - 1, object[i][2], object[i][3]));
+    }
+    return result;
+}
+
 function makeCeiling() {
     ceiling = [
-        vec4(-250, 150, 450, 1.0),
-        vec4(250, 150, 450, 1.0),
-        vec4(-250, 150, -450, 1.0),
-        vec4(250, 150, -450, 1.0),
+        vec3(-250, 150, 450),
+        vec3(250, 150, 450),
+        vec3(-250, 150, -450),
+        vec3(250, 150, -450),
     ];
     quad(ceiling, 2, 0, 1, 3, 0);
 }
@@ -193,6 +221,20 @@ function quad(object, a, b, c, d, element) {
         normalsArray.push(normal);
         carpet.push(object[d]);
         normalsArray.push(normal);
+    } else if (element == 2){
+        doors.push(object[a]);
+        normalsArray.push(normal);
+        doors.push(object[b]);
+        normalsArray.push(normal);
+        doors.push(object[c]);
+        normalsArray.push(normal);
+
+        doors.push(object[a]);
+        normalsArray.push(normal);
+        doors.push(object[c]);
+        normalsArray.push(normal);
+        doors.push(object[d]);
+        normalsArray.push(normal);
     }
 }
 
@@ -208,50 +250,50 @@ function cooridors(floor) {
 
 function createLeftRooms(floor) {
     if (floor == 4) {
-        createRoom(vec4(min_x, 0, -450, 1.0), 2 * 50, 100, 150, true, false, true, true);
+        createRoom(vec4(min_x, 0, -450), 2 * 50, 100, 150, true, false, true, true);
         for (var i = 2; i < 8; i++) {
-            createRoom(vec4(min_x, 0, (-450 + (i * 50)), 1.0), 50, 100, 150, true, true, true, true);
+            createRoom(vec4(min_x, 0, (-450 + (i * 50))), 50, 100, 150, true, true, true, true);
         }
-        createRoom(vec4(min_x, 0, (-450 + (8 * 50)), 1.0), 2 * 50, 100, 150, true, true, true, true);
+        createRoom(vec4(min_x, 0, (-450 + (8 * 50))), 2 * 50, 100, 150, true, true, true, true);
         for (var i = 10; i < 17; i++) {
-            createRoom(vec4(min_x, 0, (-450 + (i * 50)), 1.0), 50, 100, 150, true, true, true, true);
+            createRoom(vec4(min_x, 0, (-450 + (i * 50))), 50, 100, 150, true, true, true, true);
         }
-        createRoom(vec4(min_x, 0, (-450 + (17 * 50)), 1.0), 50, 100, 150, true, true, true, true);
+        createRoom(vec4(min_x, 0, (-450 + (17 * 50))), 50, 100, 150, true, true, true, true);
     }
 }
 
 function createRightRooms(floor) {
     if (floor == 4) {
-        createRoom(vec4(250, 0, -450, 1.0), 2 * 50, -100, 150, true, true, true, true);
+        createRoom(vec4(250, 0, -450), 2 * 50, -100, 150, true, true, true, true);
         for (var i = 2; i < 17; i++) {
-            createRoom(vec4(250, 0, (-450 + (i * 50)), 1.0), 50, -100, 150, true, true, true, true);
+            createRoom(vec4(250, 0, (-450 + (i * 50))), 50, -100, 150, true, true, true, true);
         }
-        createRoom(vec4(250, 0, (-450 + (17 * 50)), 1.0), 50, -100, 150, true, true, true, true);
+        createRoom(vec4(250, 0, (-450 + (17 * 50))), 50, -100, 150, true, true, true, true);
     }
 }
 
 function createLab(floor) {
     if (floor == 4) {
         // First three labs
-        createRoom(vec4(-149, 0, -550, 1.0), 150, 124, 150, true, true, true, true);
-        createRoom(vec4(-25, 0, -550, 1.0), 150, 125, 150, true, true, true, true);
-        createRoom(vec4(120, 0, -550, 1.0), 150, 49, 150, true, true, true, true);
+        createRoom(vec4(-149, 0, -550), 150, 124, 150, true, true, true, true);
+        createRoom(vec4(-25, 0, -550), 150, 125, 150, true, true, true, true);
+        createRoom(vec4(120, 0, -550), 150, 49, 150, true, true, true, true);
 
         // 2nd from last two labs
-        createRoom(vec4(-100, 0, 125, 1.0), 75, 100, 150, true, true, true, true);
-        createRoom(vec4(0, 0, 125, 1.0), 75, 100, 150, true, true, true, true);
+        createRoom(vec4(-100, 0, 125), 75, 100, 150, true, true, true, true);
+        createRoom(vec4(0, 0, 125), 75, 100, 150, true, true, true, true);
 
         // Last two labs
-        createRoom(vec4(-100, 0, 200, 1.0), 200, 100, 150, true, true, true, true);
-        createRoom(vec4(0, 0, 200, 1.0), 200, 100, 150, true, true, true, true);
+        createRoom(vec4(-100, 0, 200), 200, 100, 150, true, true, true, true);
+        createRoom(vec4(0, 0, 200), 200, 100, 150, true, true, true, true);
 
         // 2nd from first three labs
-        createRoom(vec4(-100, 0, -400, 1.0), 200, 100, 150, true, true, true, true);
-        createRoom(vec4(0, 0, -400, 1.0), 100, 100, 150, true, true, true, true);
-        createRoom(vec4(0, 0, -300, 1.0), 100, 100, 150, false, true, true, true);
+        createRoom(vec4(-100, 0, -400), 200, 100, 150, true, true, true, true);
+        createRoom(vec4(0, 0, -400), 100, 100, 150, true, true, true, true);
+        createRoom(vec4(0, 0, -300), 100, 100, 150, false, true, true, true);
         // Stairs
-        createRoom(vec4(-100, 0, -35, 1.0), 70, 75, 150, true, true, true, true);
-        createRoom(vec4(-25, 0, -35, 1.0), 70, 125, 150, true, true, true, true);
+        createRoom(vec4(-100, 0, -35), 70, 75, 150, true, true, true, true);
+        createRoom(vec4(-25, 0, -35), 70, 125, 150, true, true, true, true);
     }
 }
 
@@ -285,12 +327,12 @@ window.onload = function init() {
     program = initShaders(gl, "vertex-shader", "fragment-shader");
     gl.useProgram(program);
 
+    // createLeftRooms(4);
+    // createRightRooms(4);
     createLab(4);
-    createLeftRooms(4);
-    createRightRooms(4);
-    createRestroom(4);
-    cooridors(4);
-    makeCeiling();
+    // createRestroom(4);
+    // cooridors(4);
+    // makeCeiling();
     /*var cBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW);
@@ -309,10 +351,10 @@ window.onload = function init() {
 
     var vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(pointsArray.concat(carpet)), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(pointsArray.concat(carpet).concat(doors)), gl.STATIC_DRAW);
 
     var vPosition = gl.getAttribLocation(program, "vPosition");
-    gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
 
     modelView = gl.getUniformLocation(program, "modelView");
@@ -434,7 +476,7 @@ var render = function () {
     pMatrix = myPerspective(fovy, aspect, near, far);
     //console.log("camera xform: " + mvMatrix);
     //console.log("perspective xform: " + pMatrix);
-
+    // lightAmbient = vec4(0.5, 0.8, 0.4, 1.0);
     var ambientProduct = mult(lightAmbient, materialAmbient);
     var diffuseProduct = mult(lightDiffuse, materialDiffuse);
     var specularProduct = mult(lightSpecular, materialSpecular);
@@ -455,8 +497,15 @@ var render = function () {
     // gl.uniformMatrix4fv( projection, false, flatten(pMatrix) );
     gl.uniformMatrix4fv(projection, false, flatten(m_P));
 
+
+
+    gl.drawArrays(gl.TRIANGLES, pointsArray.length+carpet.length, doors.length);
+    lightAmbient = vec4(0.2, 0.2, 0.2, 1.0);
+    ambientProduct = mult(lightAmbient, materialAmbient);
+    gl.uniform4fv(gl.getUniformLocation(program, "ambientProduct"), flatten(ambientProduct));
     gl.drawArrays(gl.TRIANGLES, 0, pointsArray.length);
     gl.drawArrays(gl.TRIANGLES, pointsArray.length, carpet.length);
+
     requestAnimFrame(render);
 }
 
