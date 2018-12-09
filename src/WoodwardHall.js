@@ -100,9 +100,16 @@ var mvMatrix, pMatrix;
 var modelView, projection;
 
 var personheight = 100;
-var up = vec3(0.0, -1.0, 0.0);
+//var up = vec3(0.0, -1.0, 0.0);
+var up = vec3(0.0, 1.0, 0.0);
+
 var eye = vec3(-125, personheight, -300); // Initial at left corridor, better at elevator
 var at = vec3(-125, personheight, 0);
+/*
+var eye = vec3(-125, 800, -300); // Initial at left corridor, better at elevator
+var at = vec3(-125, 200, -300);
+var up = vec3(0.0, 0.0, -1.0);
+*/
 
 var speed = 0.5;
 
@@ -301,6 +308,16 @@ function cooridors(floor) {
   }
 }
 
+
+function floors(floor) {
+  if (floor == 4) {
+    quad(leftCorridor, 2, 0, 1, 3, 1);
+    quad(rightCorridor, 2, 0, 1, 3, 1);
+    quad(frontCorridor, 2, 0, 1, 3, 1);
+    quad(backCorridor, 2, 0, 1, 3, 1);
+  }
+}
+
 function createLeftRooms(floor) {
   if (floor == 4) {
     createRoom(vec4(min_x, 0, -450), 2 * 50, 100, 150, true, false, true, true);
@@ -394,7 +411,7 @@ function getIdentityMat() {
 function getRotation(eye, at, up) {
   // Check at and up is not same.
   while (equal(at, up)) {
-    at[0] += 0.0001;
+    at[2] += 0.0001;
   }
   var n = normalize(subtract(at, eye)); // view direction vector
   var u = normalize(cross(up, n)); // perpendicular vector
@@ -478,6 +495,7 @@ window.onload = function init() {
   createLab(4);
   createRestroom(4);
   cooridors(4);
+  floors(4);
 
   var nBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
@@ -535,7 +553,8 @@ var render = function() {
   var m_P = getProjection();
 
 
-  mvMatrix = lookAt(eye, at, subtract(up, eye));
+  //mvMatrix = lookAt(eye, at, subtract(up, eye));
+  mvMatrix = lookAt(eye, at, up);
   pMatrix = perspective(fovy, aspect, near, far);
 
   var ambientProduct = mult(lightAmbient, materialAmbient);
@@ -551,11 +570,11 @@ var render = function() {
   // gl.uniform4fv(gl.getUniformLocation(program, "lightSource"), flatten(vec4(eye, 0.0)));
 
   gl.uniform1f(gl.getUniformLocation(program, "shininess"), materialShininess);
-  //gl.uniformMatrix4fv(modelView, false, flatten(mvMatrix));
-  //gl.uniformMatrix4fv(projection, false, flatten(pMatrix));
+  gl.uniformMatrix4fv(modelView, false, flatten(mvMatrix));
+  gl.uniformMatrix4fv(projection, false, flatten(pMatrix));
 
-  gl.uniformMatrix4fv(modelView, false, flatten(m_Camera));
-  gl.uniformMatrix4fv(projection, false, flatten(m_P));
+  //gl.uniformMatrix4fv(modelView, false, flatten(m_Camera));
+  //gl.uniformMatrix4fv(projection, false, flatten(m_P));
 
 
   gl.activeTexture(gl.TEXTURE0);
