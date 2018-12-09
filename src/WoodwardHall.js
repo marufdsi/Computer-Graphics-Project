@@ -80,7 +80,8 @@ var vertexColors = [
   vec4(0.0, 1.0, 1.0, 1.0), // cyan
   vec4(1.0, 1.0, 1.0, 1.0), // white
 ];
-
+var floorChanged = false;
+var selectedFloor = 3;
 
 var near = -1.0;
 var far = 1.0;
@@ -332,37 +333,30 @@ function quad(object, a, b, c, d, element) {
 
 
 function cooridors(floor) {
-  if (floor == 4) {
-    quad(leftCorridor, 2, 0, 1, 3, 1);
-    quad(rightCorridor, 2, 0, 1, 3, 1);
-    quad(frontCorridor, 2, 0, 1, 3, 1);
-    quad(backCorridor, 2, 0, 1, 3, 1);
-  }
+    if (floor == 3 || floor == 4) {
+        quad(leftCorridor, 2, 0, 1, 3, 1);
+        quad(rightCorridor, 2, 0, 1, 3, 1);
+        quad(frontCorridor, 2, 0, 1, 3, 1);
+        quad(backCorridor, 2, 0, 1, 3, 1);
+    }
 }
 
-
-function floors(floor) {
-  if (floor == 4) {
-    quad(leftCorridor, 2, 0, 1, 3, 1);
-    quad(rightCorridor, 2, 0, 1, 3, 1);
-    quad(frontCorridor, 2, 0, 1, 3, 1);
-    quad(backCorridor, 2, 0, 1, 3, 1);
-  }
-}
 
 function createLeftRooms(floor) {
-  if (floor == 4) {
-    createRoom(vec4(min_x, 0, -450), 2 * 50, 100, 150, true, false, true, true);
-    for (var i = 2; i < 8; i++) {
-      createRoom(vec4(min_x, 0, (-450 + (i * 50))), 50, 100, 150, true, true, true, true);
-    }
-    createRoom(vec4(min_x, 0, (-450 + (8 * 50))), 2 * 50, 100, 150, true, true, true, true);
-    for (var i = 10; i < 17; i++) {
-      createRoom(vec4(min_x, 0, (-450 + (i * 50))), 50, 100, 150, true, true, true, true);
+    if (floor == 3 || floor == 4) {
+        createRoom(vec4(min_x, 0, -450), 2 * 50, 100, 150, true, false, true, true);
+        for (var i = 2; i < 8; i++) {
+            createRoom(vec4(min_x, 0, (-450 + (i * 50))), 50, 100, 150, true, true, true, true);
+        }
+        createRoom(vec4(min_x, 0, (-450 + (8 * 50))), 2 * 50, 100, 150, true, true, true, true);
+        for (var i = 10; i < 17; i++) {
+            createRoom(vec4(min_x, 0, (-450 + (i * 50))), 50, 100, 150, true, true, true, true);
+        }
+        createRoom(vec4(min_x, 0, (-450 + (17 * 50))), 50, 100, 150, true, true, true, true);
     }
     createRoom(vec4(min_x, 0, (-450 + (17 * 50))), 50, 100, 150, true, true, true, true);
   }
-}
+
 
 function createRightRooms(floor) {
   if (floor == 4) {
@@ -375,32 +369,53 @@ function createRightRooms(floor) {
 }
 
 function createLab(floor) {
-  if (floor == 4) {
-    // First three labs
-    createRoom(vec4(-149, 0, -550), 150, 124, 150, true, true, true, true);
-    createRoom(vec4(-25, 0, -550), 150, 125, 150, true, true, true, true);
-    createRoom(vec4(120, 0, -550), 150, 49, 150, true, true, true, true);
+    if (floor == 4) {
+        // First three labs
+        createRoom(vec4(-150, 0, -550), 150, 125, 150, true, true, true, true);
+        createRoom(vec4(-25, 0, -550), 150, 125, 150, true, true, true, true);
+        createRoom(vec4(120, 0, -550), 150, 49, 150, true, true, true, true);
 
-    // 2nd from last two labs
-    createRoom(vec4(-100, 0, 125), 75, 100, 150, true, true, true, true);
-    createRoom(vec4(0, 0, 125), 75, 100, 150, true, true, true, true);
+        // 2nd from last two labs
+        createRoom(vec4(0, 0, 125), 75, -100, 150, true, true, true, true);
+        createRoom(vec4(0, 0, 125), 75, 100, 150, true, true, true, true);
 
-    // Last two labs
-    createRoom(vec4(-100, 0, 200), 200, 100, 150, true, true, true, true);
-    createRoom(vec4(0, 0, 200), 200, 100, 150, true, true, true, true);
+        // Last two labs
+        createRoom(vec4(0, 0, 200), 200, -100, 150, true, true, true, true);
+        createRoom(vec4(0, 0, 200), 200, 100, 150, true, true, true, true);
 
-    // 2nd from first three labs
-    createRoom(vec4(-100, 0, -400), 200, 100, 150, true, true, true, true);
-    createRoom(vec4(100, 0, -400), 100, -100, 150, true, true, false, true);
-    createRoom(vec4(100, 0, -300), 100, -100, 150, false, true, false, true);
-    // Stairs
-    createRoom(vec4(-100, 0, -35), 70, 75, 150, true, true, true, true);
-    createRoom(vec4(-25, 0, -35), 70, 125, 150, true, true, true, true);
-  }
+        // 2nd from first three labs
+        createRoom(vec4(0, 0, -400), 200, -100, 150, true, true, true, true);
+        createRoom(vec4(0, 0, -400), 100, 100, 150, true, true, false, true);
+        createRoom(vec4(0, 0, -300), 100, 100, 150, false, true, false, true);
+        // Stairs
+        createRoom(vec4(-25, 0, -35), 70, -75, 150, true, true, true, true);
+        createRoom(vec4(-25, 0, -35), 70, 125, 150, true, true, true, true);
+    }
+    if (floor == 3) {
+        // First three labs
+        createRoom(vec4(-150, 0, -550), 150, 125, 150, true, true, true, true);
+        createRoom(vec4(-25, 0, -550), 150, 125, 150, true, true, true, true);
+        createRoom(vec4(120, 0, -550), 150, 49, 150, true, true, true, true);
+
+        // 2nd from last two labs
+        createRoom(vec4(0, 0, 125), 75, -100, 150, true, true, true, true);
+        createRoom(vec4(0, 0, 125), 75, 100, 150, true, true, true, true);
+
+        // Last labs
+        createRoom(vec4(-100, 0, 200), 200, 200, 150, true, true, true, true);
+
+        // 2nd from first three labs
+        createRoom(vec4(0, 0, -400), 200, -100, 150, true, true, true, true);
+        createRoom(vec4(0, 0, -400), 100, 100, 150, true, true, false, true);
+        createRoom(vec4(0, 0, -300), 100, 100, 150, false, true, false, true);
+        // Stairs
+        createRoom(vec4(-25, 0, -35), 70, -75, 150, true, true, true, true);
+        createRoom(vec4(-25, 0, -35), 70, 125, 150, true, true, true, true);
+    }
 }
 
 function createRestroom(floor) {
-  if (floor == 4) {
+    if (floor == 3 || floor == 4) {
 
   }
 }
@@ -504,82 +519,105 @@ function getProjection() {
 var uSampler;
 
 window.onload = function init() {
-  canvas = document.getElementById("gl-canvas");
-  gl = WebGLUtils.setupWebGL(canvas);
-  if (!gl) {
-    alert("WebGL isn't available");
-  }
+    canvas = document.getElementById("gl-canvas");
+    gl = WebGLUtils.setupWebGL(canvas);
+    if (!gl) {
+        alert("WebGL isn't available");
+    }
 
-  gl.viewport(0, 0, canvas.width, canvas.height);
-  aspect = canvas.width / canvas.height;
-  gl.clearColor(0.3, 0.1, 0.3, 1.0);
-  gl.enable(gl.DEPTH_TEST);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    aspect = canvas.width / canvas.height;
+    gl.clearColor(0.3, 0.1, 0.3, 1.0);
+    gl.enable(gl.DEPTH_TEST);
 
-  //
-  //  Load shaders and initialize attribute buffers
-  //
-  program = initShaders(gl, "vertex-shader", "fragment-shader");
-  gl.useProgram(program);
-  initTextures(); //initTextures(draw);
+    //
+    //  Load shaders and initialize attribute buffers
+    //
+    program = initShaders(gl, "vertex-shader", "fragment-shader");
+    gl.useProgram(program);
+    initTextures(); //initTextures(draw);
 
-  createLeftRooms(4);
-  createRightRooms(4);
-  createLab(4);
-  createRestroom(4);
-  cooridors(4);
-  floors(4);
-  makeCeiling();
+    loadFloor(selectedFloor);
 
-  var nBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, flatten(normalsArray), gl.STATIC_DRAW);
+    modelView = gl.getUniformLocation(program, "modelView");
+    projection = gl.getUniformLocation(program, "projection");
+    uSampler = gl.getUniformLocation(program, "uSampler"); // buttons for viewing parameters
 
-  var vNormal = gl.getAttribLocation(program, "vNormal");
-  gl.vertexAttribPointer(vNormal, 3, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(vNormal);
+    var useLighting = gl.getUniformLocation(program, "uUseLighting"); // buttons for viewing parameters
+    gl.uniform1i(useLighting, 0);
 
-  var vBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, flatten(walls.concat(doors).concat(carpet)), gl.STATIC_DRAW);
-
-  var vPosition = gl.getAttribLocation(program, "vPosition");
-  gl.enableVertexAttribArray(vPosition);
-  gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0);
-
-  var tBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, tBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, flatten(textureArrayWall.concat(textureArrayDoor).concat(textureArrayFloor)), gl.STATIC_DRAW);
-
-  var tTexture = gl.getAttribLocation(program, "aTextureCoord");
-  gl.enableVertexAttribArray(tTexture);
-  gl.vertexAttribPointer(tTexture, 2, gl.FLOAT, false, 0, 0);
-
-  modelView = gl.getUniformLocation(program, "modelView");
-  projection = gl.getUniformLocation(program, "projection");
-  uSampler = gl.getUniformLocation(program, "uSampler"); // buttons for viewing parameters
-
-  var useLighting = gl.getUniformLocation(program, "uUseLighting"); // buttons for viewing parameters
-  gl.uniform1i(useLighting, 0);
-
-  var useTexture = gl.getUniformLocation(program, "uUseTextureF"); // buttons for viewing parameters
-  gl.uniform1i(useTexture, 1);
+    var useTexture = gl.getUniformLocation(program, "uUseTextureF"); // buttons for viewing parameters
+    gl.uniform1i(useTexture, 1);
 
 
-  document.onkeydown = handleKeyDown;
-  document.onkeyup = handleKeyUp;
-  canvas.onmousedown = canvasMouseDown;
-  document.onmouseup = handleMouseUp;
-  canvas.onmousemove = canvasMouseMove;
+    document.onkeydown = handleKeyDown;
+    document.onkeyup = handleKeyUp;
+    canvas.onmousedown = canvasMouseDown;
+    document.onmouseup = handleMouseUp;
+    canvas.onmousemove = canvasMouseMove;
 
-  render();
+    document.getElementById("changeFloor").onchange = function () {
+        selectedFloor = parseInt(document.getElementById("changeFloor").value);
+        floorChanged = true;
+    };
+
+    render();
+}
+
+function loadFloor(numberOfFloor) {
+    walls = [];
+    carpet = [];
+    doors = [];
+    normalsArray = [];
+
+    textureArrayFloor = [];
+    textureArrayWall = [];
+    textureArrayDoor = [];
+
+    createLeftRooms(numberOfFloor);
+    createRightRooms(numberOfFloor);
+    createLab(numberOfFloor);
+    createRestroom(numberOfFloor);
+    cooridors(numberOfFloor);
+    // floors(numberOfFloor);
+    makeCeiling();
+
+    var nBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(normalsArray), gl.STATIC_DRAW);
+
+    var vNormal = gl.getAttribLocation(program, "vNormal");
+    gl.vertexAttribPointer(vNormal, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vNormal);
+
+    var vBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(walls.concat(doors).concat(carpet)), gl.STATIC_DRAW);
+
+    var vPosition = gl.getAttribLocation(program, "vPosition");
+    gl.enableVertexAttribArray(vPosition);
+    gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0);
+
+    var tBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, tBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(textureArrayWall.concat(textureArrayDoor).concat(textureArrayFloor)), gl.STATIC_DRAW);
+
+    var tTexture = gl.getAttribLocation(program, "aTextureCoord");
+    gl.enableVertexAttribArray(tTexture);
+    gl.vertexAttribPointer(tTexture, 2, gl.FLOAT, false, 0, 0);
+
 }
 
 var render = function() {
   gl.clearDepth(1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  handleKeys();
-  check_valid_up();
+    if (floorChanged) {
+        loadFloor(selectedFloor);
+        floorChanged = false;
+    }
+    handleKeys();
+    check_valid_up();
 
 
   var m_Camera = getCamera(eye, at, up);
@@ -620,16 +658,16 @@ var render = function() {
   ambientProduct = mult(lightAmbient, materialAmbient);
   gl.uniform4fv(gl.getUniformLocation(program, "ambientProduct"), flatten(ambientProduct));
 
-  gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, textures[0]);
-  gl.uniform1i(uSampler, 0);
-  gl.drawArrays(gl.TRIANGLES, 0, walls.length); // wall
-
-  gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, textures[2]);
-  gl.uniform1i(uSampler, 0);
-  gl.drawArrays(gl.TRIANGLES, walls.length + doors.length, carpet.length); // carpet
-
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, textures[0]);
+    gl.uniform1i(uSampler, 0);
+    gl.drawArrays(gl.TRIANGLES, 0, walls.length);// wall
+    if (carpet.length>0) {
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, textures[2]);
+        gl.uniform1i(uSampler, 0);
+        gl.drawArrays(gl.TRIANGLES, walls.length + doors.length, carpet.length); // carpet
+    }
 
   requestAnimFrame(render);
 }
