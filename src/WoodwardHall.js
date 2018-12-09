@@ -67,9 +67,9 @@ var modelView, projection;
 //var eye = vec3(-200.0, 600.0, -800.0);
 //var at = vec3(0.0, 0.0, 0.0);
 var personheight = 100;
-var up = vec3(0.0, -1.0, 0.0);
-var eye = vec3(-125, personheight, -375); // Initial at left corridor, better at elevator
-var at = vec3(-125, personheight, 0);
+var up = vec3(0.0, 1.0, 0.0);
+var eye = vec3(-150, personheight, -400); // Initial at left corridor, better at elevator
+var at = vec3(0, 0, 0);
 
 var speed = 0.5;
 
@@ -77,7 +77,7 @@ var normalsArray = [];
 var carpet = [];
 var doors = [];
 
-var lightSource = vec4(-175, 145.0, 0.0, 0.0);
+var lightSource = vec4(-115, 100.0, 0.0, 0.0);
 var lightAmbient = vec4(1.0, 1.0, 1.0, 1.0);
 var lightDiffuse = vec4(1.0, 1.0, 1.0, 1.0);
 var lightSpecular = vec4(1.0, 1.0, 1.0, 1.0);
@@ -113,9 +113,9 @@ function createRoom(start, length, width, height, dLWall, dRWall, dBWall, dFWall
     ];
     leftSide = [
         vec3(start[0], height, start[2]),
-        vec3(start[0] + width, height, start[2]),
         vec3(start[0], 0, start[2]),
         vec3(start[0] + width, 0, start[2]),
+        vec3(start[0] + width, height, start[2]),
     ];
     rightSide = [
         vec3(start[0], height, start[2] + length),
@@ -161,7 +161,7 @@ function createRoom(start, length, width, height, dLWall, dRWall, dBWall, dFWall
         quad(backSide, 2, 0, 1, 3, 0);
     }
     if (dLWall) {
-        quad(leftSide, 2, 3, 1, 0, 0);
+        quad(leftSide, 0, 1, 2, 3, 0);
     }
     if (dRWall) {
         quad(rightSide, 2, 0, 1, 3, 0);
@@ -187,7 +187,7 @@ function makeCeiling() {
     quad(ceiling, 2, 0, 1, 3, 0);
 }
 
-function quad(object, a, d, c, b, element) {
+function quad(object, a, b, c, d, element) {
     var t1 = subtract(object[b], object[a]);
     var t2 = subtract(object[c], object[b]);
     var normal = cross(t1, t2);
@@ -275,17 +275,17 @@ function createRightRooms(floor) {
 function createLab(floor) {
     if (floor == 4) {
         // First three labs
-        // createRoom(vec4(-149, 0, -550), 150, 124, 150, true, true, true, true);
-        // createRoom(vec4(-25, 0, -550), 150, 125, 150, true, true, true, true);
-        // createRoom(vec4(120, 0, -550), 150, 49, 150, true, true, true, true);
-        //
-        // // 2nd from last two labs
-        // createRoom(vec4(-100, 0, 125), 75, 100, 150, true, true, true, true);
-        // createRoom(vec4(0, 0, 125), 75, 100, 150, true, true, true, true);
-        //
-        // // Last two labs
-        // createRoom(vec4(-100, 0, 200), 200, 100, 150, true, true, true, true);
-        // createRoom(vec4(0, 0, 200), 200, 100, 150, true, true, true, true);
+        createRoom(vec4(-149, 0, -550), 150, 124, 150, true, true, true, true);
+        createRoom(vec4(-25, 0, -550), 150, 125, 150, true, true, true, true);
+        createRoom(vec4(120, 0, -550), 150, 49, 150, true, true, true, true);
+
+        // 2nd from last two labs
+        createRoom(vec4(-100, 0, 125), 75, 100, 150, true, true, true, true);
+        createRoom(vec4(0, 0, 125), 75, 100, 150, true, true, true, true);
+
+        // Last two labs
+        createRoom(vec4(-100, 0, 200), 200, 100, 150, true, true, true, true);
+        createRoom(vec4(0, 0, 200), 200, 100, 150, true, true, true, true);
 
         // 2nd from first three labs
         createRoom(vec4(-100, 0, -400), 200, 100, 150, true, true, true, true);
@@ -330,9 +330,9 @@ window.onload = function init() {
     createLeftRooms(4);
     createRightRooms(4);
     createLab(4);
-    // createRestroom(4);
+    createRestroom(4);
     cooridors(4);
-    makeCeiling();
+    // makeCeiling();
     /*var cBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW);
@@ -470,13 +470,11 @@ var render = function () {
 
     handleKeys();
     check_valid_up();
-    var m_Camera = getCamera(eye, at, up);
-    var m_P = getProjection();
+    /*var m_Camera = getCamera(eye, at, up);
+    var m_P = getProjection();*/
     mvMatrix = lookAt(eye, at, subtract(up, eye));
-    pMatrix = myPerspective(fovy, aspect, near, far);
-    //console.log("camera xform: " + mvMatrix);
-    //console.log("perspective xform: " + pMatrix);
-    // lightAmbient = vec4(0.5, 0.8, 0.4, 1.0);
+    pMatrix = perspective(fovy, aspect, near, far);
+
     var ambientProduct = mult(lightAmbient, materialAmbient);
     var diffuseProduct = mult(lightDiffuse, materialDiffuse);
     var specularProduct = mult(lightSpecular, materialSpecular);
@@ -493,9 +491,9 @@ var render = function () {
     gl.uniform1f(gl.getUniformLocation(program, "shininess"), materialShininess);
 
     // gl.uniformMatrix4fv( modelView, false, flatten(mvMatrix) );
-    gl.uniformMatrix4fv(modelView, false, flatten(m_Camera));
+    gl.uniformMatrix4fv(modelView, false, flatten(mvMatrix));
     // gl.uniformMatrix4fv( projection, false, flatten(pMatrix) );
-    gl.uniformMatrix4fv(projection, false, flatten(m_P));
+    gl.uniformMatrix4fv(projection, false, flatten(pMatrix));
 
 
 
