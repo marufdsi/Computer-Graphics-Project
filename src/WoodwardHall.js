@@ -77,8 +77,8 @@ var normalsArray = [];
 var carpet = [];
 var doors = [];
 
-var lightSource = vec4(-205, 150.0, 300.0, 0.0);
-var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0);
+var lightSource = vec4(-175, 145.0, 0.0, 0.0);
+var lightAmbient = vec4(1.0, 1.0, 1.0, 1.0);
 var lightDiffuse = vec4(1.0, 1.0, 1.0, 1.0);
 var lightSpecular = vec4(1.0, 1.0, 1.0, 1.0);
 
@@ -147,24 +147,24 @@ function createRoom(start, length, width, height, dLWall, dRWall, dBWall, dFWall
         vec3(start[0] + width, (3*height/4), start[2]+(2*length/3)),
         // door
         vec3(start[0] + width, (3*height/4), start[2]+(length/3)),
-        vec3(start[0] + width, (3*height/4), start[2] + length),
+        vec3(start[0] + width, (3*height/4), start[2] + (2*length/3)),
         vec3(start[0] + width, 0, start[2]+(length/3)),
         vec3(start[0] + width, 0, start[2]+(2*length/3)),
     ];
-    if (dLWall) {
-        quad(leftSide, 2, 0, 1, 3, 0);
-    }
-    if (dRWall) {
-        quad(rightSide, 2, 0, 1, 3, 0);
-    }
-    if (dBWall) {
-        quad(backSide, 2, 0, 1, 3, 0);
-    }
     if (dFWall) {
         quad(frontSide, 2, 0, 1, 3, 0);
         quad(frontSide, 6, 4, 5, 7, 0);
         quad(frontSide, 10, 8, 9, 11, 0);
         quad(frontSide, 14, 12, 13, 15, 2);
+    }
+    if (dBWall) {
+        quad(backSide, 2, 0, 1, 3, 0);
+    }
+    if (dLWall) {
+        quad(leftSide, 2, 3, 1, 0, 0);
+    }
+    if (dRWall) {
+        quad(rightSide, 2, 0, 1, 3, 0);
     }
     quad(basement, 2, 0, 1, 3, 1);
 }
@@ -187,7 +187,7 @@ function makeCeiling() {
     quad(ceiling, 2, 0, 1, 3, 0);
 }
 
-function quad(object, a, b, c, d, element) {
+function quad(object, a, d, c, b, element) {
     var t1 = subtract(object[b], object[a]);
     var t2 = subtract(object[c], object[b]);
     var normal = cross(t1, t2);
@@ -275,22 +275,22 @@ function createRightRooms(floor) {
 function createLab(floor) {
     if (floor == 4) {
         // First three labs
-        createRoom(vec4(-149, 0, -550), 150, 124, 150, true, true, true, true);
-        createRoom(vec4(-25, 0, -550), 150, 125, 150, true, true, true, true);
-        createRoom(vec4(120, 0, -550), 150, 49, 150, true, true, true, true);
-
-        // 2nd from last two labs
-        createRoom(vec4(-100, 0, 125), 75, 100, 150, true, true, true, true);
-        createRoom(vec4(0, 0, 125), 75, 100, 150, true, true, true, true);
-
-        // Last two labs
-        createRoom(vec4(-100, 0, 200), 200, 100, 150, true, true, true, true);
-        createRoom(vec4(0, 0, 200), 200, 100, 150, true, true, true, true);
+        // createRoom(vec4(-149, 0, -550), 150, 124, 150, true, true, true, true);
+        // createRoom(vec4(-25, 0, -550), 150, 125, 150, true, true, true, true);
+        // createRoom(vec4(120, 0, -550), 150, 49, 150, true, true, true, true);
+        //
+        // // 2nd from last two labs
+        // createRoom(vec4(-100, 0, 125), 75, 100, 150, true, true, true, true);
+        // createRoom(vec4(0, 0, 125), 75, 100, 150, true, true, true, true);
+        //
+        // // Last two labs
+        // createRoom(vec4(-100, 0, 200), 200, 100, 150, true, true, true, true);
+        // createRoom(vec4(0, 0, 200), 200, 100, 150, true, true, true, true);
 
         // 2nd from first three labs
         createRoom(vec4(-100, 0, -400), 200, 100, 150, true, true, true, true);
-        createRoom(vec4(0, 0, -400), 100, 100, 150, true, true, true, true);
-        createRoom(vec4(0, 0, -300), 100, 100, 150, false, true, true, true);
+        createRoom(vec4(100, 0, -400), 100, -100, 150, true, true, false, true);
+        createRoom(vec4(100, 0, -300), 100, -100, 150, false, true, false, true);
         // Stairs
         createRoom(vec4(-100, 0, -35), 70, 75, 150, true, true, true, true);
         createRoom(vec4(-25, 0, -35), 70, 125, 150, true, true, true, true);
@@ -330,7 +330,7 @@ window.onload = function init() {
     createLeftRooms(4);
     createRightRooms(4);
     createLab(4);
-    createRestroom(4);
+    // createRestroom(4);
     cooridors(4);
     makeCeiling();
     /*var cBuffer = gl.createBuffer();
