@@ -104,10 +104,17 @@ void main()
     <label>WASD to move, ER to change speed, CZ to Crouch or Prone, SPACE to jump</label><br />
     <label>Mouse click to view different angles, drag to change walking direction</label><br />
   </div>
-  <div style="width:100%; text-align: center;">
+  <div style="width:82%; text-align: left; float: left">
     <canvas id="gl-canvas" width="1000" height="1000">
       Oops ... your browser doesn't support the HTML5 canvas element
     </canvas>
+  </div>
+  <div style="width:18%; text-align: left; float: right">
+      Change the Floor:
+      <select id="changeFloor">
+          <option value="3">3rd Floor</option>
+          <option value="4">4th Floor</option>
+      </select>
   </div>
 </body>
 

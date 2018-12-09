@@ -80,7 +80,8 @@ var vertexColors = [
     vec4(0.0, 1.0, 1.0, 1.0), // cyan
     vec4(1.0, 1.0, 1.0, 1.0), // white
 ];
-
+var floorChanged = false;
+var selectedFloor = 3;
 
 var near = -1.0;
 var far = 1.0;
@@ -332,7 +333,7 @@ function quad(object, a, b, c, d, element) {
 
 
 function cooridors(floor) {
-    if (floor == 4) {
+    if (floor == 3 || floor == 4) {
         quad(leftCorridor, 2, 0, 1, 3, 1);
         quad(rightCorridor, 2, 0, 1, 3, 1);
         quad(frontCorridor, 2, 0, 1, 3, 1);
@@ -340,7 +341,7 @@ function cooridors(floor) {
     }
 }
 
-
+/*
 function floors(floor) {
     if (floor == 4) {
         quad(leftCorridor, 2, 0, 1, 3, 1);
@@ -348,10 +349,10 @@ function floors(floor) {
         quad(frontCorridor, 2, 0, 1, 3, 1);
         quad(backCorridor, 2, 0, 1, 3, 1);
     }
-}
+}*/
 
 function createLeftRooms(floor) {
-    if (floor == 4) {
+    if (floor == 3 || floor == 4) {
         createRoom(vec4(min_x, 0, -450), 2 * 50, 100, 150, true, false, true, true);
         for (var i = 2; i < 8; i++) {
             createRoom(vec4(min_x, 0, (-450 + (i * 50))), 50, 100, 150, true, true, true, true);
@@ -365,7 +366,7 @@ function createLeftRooms(floor) {
 }
 
 function createRightRooms(floor) {
-    if (floor == 4) {
+    if (floor == 3 || floor == 4) {
         createRoom(vec4(250, 0, -450), 2 * 50, -100, 150, true, true, true, true);
         for (var i = 2; i < 17; i++) {
             createRoom(vec4(250, 0, (-450 + (i * 50))), 50, -100, 150, true, true, true, true);
@@ -377,30 +378,51 @@ function createRightRooms(floor) {
 function createLab(floor) {
     if (floor == 4) {
         // First three labs
-        createRoom(vec4(-149, 0, -550), 150, 124, 150, true, true, true, true);
+        createRoom(vec4(-150, 0, -550), 150, 125, 150, true, true, true, true);
         createRoom(vec4(-25, 0, -550), 150, 125, 150, true, true, true, true);
         createRoom(vec4(120, 0, -550), 150, 49, 150, true, true, true, true);
 
         // 2nd from last two labs
-        createRoom(vec4(-100, 0, 125), 75, 100, 150, true, true, true, true);
+        createRoom(vec4(0, 0, 125), 75, -100, 150, true, true, true, true);
         createRoom(vec4(0, 0, 125), 75, 100, 150, true, true, true, true);
 
         // Last two labs
-        createRoom(vec4(-100, 0, 200), 200, 100, 150, true, true, true, true);
+        createRoom(vec4(0, 0, 200), 200, -100, 150, true, true, true, true);
         createRoom(vec4(0, 0, 200), 200, 100, 150, true, true, true, true);
 
         // 2nd from first three labs
-        createRoom(vec4(-100, 0, -400), 200, 100, 150, true, true, true, true);
-        createRoom(vec4(100, 0, -400), 100, -100, 150, true, true, false, true);
-        createRoom(vec4(100, 0, -300), 100, -100, 150, false, true, false, true);
+        createRoom(vec4(0, 0, -400), 200, -100, 150, true, true, true, true);
+        createRoom(vec4(0, 0, -400), 100, 100, 150, true, true, false, true);
+        createRoom(vec4(0, 0, -300), 100, 100, 150, false, true, false, true);
         // Stairs
-        createRoom(vec4(-100, 0, -35), 70, 75, 150, true, true, true, true);
+        createRoom(vec4(-25, 0, -35), 70, -75, 150, true, true, true, true);
+        createRoom(vec4(-25, 0, -35), 70, 125, 150, true, true, true, true);
+    }
+    if (floor == 3) {
+        // First three labs
+        createRoom(vec4(-150, 0, -550), 150, 125, 150, true, true, true, true);
+        createRoom(vec4(-25, 0, -550), 150, 125, 150, true, true, true, true);
+        createRoom(vec4(120, 0, -550), 150, 49, 150, true, true, true, true);
+
+        // 2nd from last two labs
+        createRoom(vec4(0, 0, 125), 75, -100, 150, true, true, true, true);
+        createRoom(vec4(0, 0, 125), 75, 100, 150, true, true, true, true);
+
+        // Last labs
+        createRoom(vec4(-100, 0, 200), 200, 200, 150, true, true, true, true);
+
+        // 2nd from first three labs
+        createRoom(vec4(0, 0, -400), 200, -100, 150, true, true, true, true);
+        createRoom(vec4(0, 0, -400), 100, 100, 150, true, true, false, true);
+        createRoom(vec4(0, 0, -300), 100, 100, 150, false, true, false, true);
+        // Stairs
+        createRoom(vec4(-25, 0, -35), 70, -75, 150, true, true, true, true);
         createRoom(vec4(-25, 0, -35), 70, 125, 150, true, true, true, true);
     }
 }
 
 function createRestroom(floor) {
-    if (floor == 4) {
+    if (floor == 3 || floor == 4) {
 
     }
 }
@@ -522,12 +544,49 @@ window.onload = function init() {
     gl.useProgram(program);
     initTextures(); //initTextures(draw);
 
-    createLeftRooms(4);
-    createRightRooms(4);
-    createLab(4);
-    createRestroom(4);
-    cooridors(4);
-    floors(4);
+    loadFloor(selectedFloor);
+
+    modelView = gl.getUniformLocation(program, "modelView");
+    projection = gl.getUniformLocation(program, "projection");
+    uSampler = gl.getUniformLocation(program, "uSampler"); // buttons for viewing parameters
+
+    var useLighting = gl.getUniformLocation(program, "uUseLighting"); // buttons for viewing parameters
+    gl.uniform1i(useLighting, 0);
+
+    var useTexture = gl.getUniformLocation(program, "uUseTextureF"); // buttons for viewing parameters
+    gl.uniform1i(useTexture, 1);
+
+
+    document.onkeydown = handleKeyDown;
+    document.onkeyup = handleKeyUp;
+    canvas.onmousedown = canvasMouseDown;
+    document.onmouseup = handleMouseUp;
+    canvas.onmousemove = canvasMouseMove;
+
+    document.getElementById("changeFloor").onchange = function () {
+        selectedFloor = parseInt(document.getElementById("changeFloor").value);
+        floorChanged = true;
+    };
+
+    render();
+}
+
+function loadFloor(numberOfFloor) {
+    walls = [];
+    carpet = [];
+    doors = [];
+    normalsArray = [];
+
+    textureArrayFloor = [];
+    textureArrayWall = [];
+    textureArrayDoor = [];
+
+    createLeftRooms(numberOfFloor);
+    createRightRooms(numberOfFloor);
+    createLab(numberOfFloor);
+    createRestroom(numberOfFloor);
+    cooridors(numberOfFloor);
+    // floors(numberOfFloor);
     makeCeiling();
 
     var nBuffer = gl.createBuffer();
@@ -554,30 +613,16 @@ window.onload = function init() {
     gl.enableVertexAttribArray(tTexture);
     gl.vertexAttribPointer(tTexture, 2, gl.FLOAT, false, 0, 0);
 
-    modelView = gl.getUniformLocation(program, "modelView");
-    projection = gl.getUniformLocation(program, "projection");
-    uSampler = gl.getUniformLocation(program, "uSampler"); // buttons for viewing parameters
-
-    var useLighting = gl.getUniformLocation(program, "uUseLighting"); // buttons for viewing parameters
-    gl.uniform1i(useLighting, 0);
-
-    var useTexture = gl.getUniformLocation(program, "uUseTextureF"); // buttons for viewing parameters
-    gl.uniform1i(useTexture, 1);
-
-
-    document.onkeydown = handleKeyDown;
-    document.onkeyup = handleKeyUp;
-    canvas.onmousedown = canvasMouseDown;
-    document.onmouseup = handleMouseUp;
-    canvas.onmousemove = canvasMouseMove;
-
-    render();
 }
 
 var render = function () {
     gl.clearDepth(1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+    if (floorChanged) {
+        loadFloor(selectedFloor);
+        floorChanged = false;
+    }
     handleKeys();
     check_valid_up();
 
@@ -624,12 +669,12 @@ var render = function () {
     gl.bindTexture(gl.TEXTURE_2D, textures[0]);
     gl.uniform1i(uSampler, 0);
     gl.drawArrays(gl.TRIANGLES, 0, walls.length);// wall
-
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, textures[2]);
-    gl.uniform1i(uSampler, 0);
-    gl.drawArrays(gl.TRIANGLES, walls.length + doors.length, carpet.length); // carpet
-
+    if (carpet.length>0) {
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, textures[2]);
+        gl.uniform1i(uSampler, 0);
+        gl.drawArrays(gl.TRIANGLES, walls.length + doors.length, carpet.length); // carpet
+    }
 
     requestAnimFrame(render);
 }
@@ -785,7 +830,7 @@ function moveAt(xzA, yzA) {
     var z = length(subtract(at, eye)) * Math.cos(yzA) * Math.cos(xzA);
 
     at = add(eye, vec3(x, y, z));
-    up = vec3(Math.cos(yzA - 1 / 2 * Math.PI) * Math.sin(xzA), -1*Math.sin(yzA - 1 / 2 * Math.PI), Math.cos(yzA - 1 / 2 * Math.PI) * Math.cos(xzA));
+    up = vec3(Math.cos(yzA - 1 / 2 * Math.PI) * Math.sin(xzA), -1 * Math.sin(yzA - 1 / 2 * Math.PI), Math.cos(yzA - 1 / 2 * Math.PI) * Math.cos(xzA));
 
     return [xzA, yzA];
 }
