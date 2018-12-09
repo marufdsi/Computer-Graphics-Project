@@ -3,7 +3,6 @@ var gl;
 var program;
 
 var NumVertices = 36;
-
 var walls = [];
 var carpet = [];
 var doors = [];
@@ -42,14 +41,14 @@ var IMAGES = [
 var leftCorridor = [
     vec3(-150, 0, 450),
     vec3(-100, 0.0, 450),
-    vec3(-150, 0.0, -400),
-    vec3(-100, 0.0, -400),
+    vec3(-150, 0.0, -450),
+    vec3(-100, 0.0, -450),
 ];
 var rightCorridor = [
     vec3(150, 0.0, 450.0),
     vec3(100, 0.0, 450.0),
-    vec3(150, 0.0, -400.0),
-    vec3(100, 0.0, -400.0),
+    vec3(150, 0.0, -450.0),
+    vec3(100, 0.0, -450.0),
 ];
 var frontCorridor = [
     vec3(-100, 0.0, -400.0),
@@ -203,6 +202,72 @@ function createRoom(start, length, width, height, dLWall, dRWall, dBWall, dFWall
     }
     if (dRWall) {
         quad(rightSide, 2, 0, 1, 3, 0);
+    }
+    quad(basement, 2, 0, 1, 3, 1);
+}
+
+function createRightDoorRoom(start, length, width, height, dLWall, dRWall, dBWall, dFWall) {
+    basement = [
+        vec3(start[0], 0.0, start[2] + length),
+        vec3(start[0] + width, 0.0, start[2] + length),
+        vec3(start[0], 0.0, start[2]),
+        vec3(start[0] + width, 0.0, start[2]),
+    ];
+    leftSide = [
+        vec3(start[0], height, start[2]),
+        vec3(start[0], 0, start[2]),
+        vec3(start[0] + width, 0, start[2]),
+        vec3(start[0] + width, height, start[2]),
+    ];
+    rightSide = [
+        //right potion
+        vec3(start[0], height, start[2] + length),
+        vec3(start[0] + (width/3), height, start[2] + length),
+        vec3(start[0], 0, start[2] + length),
+        vec3(start[0] + (width/3), 0, start[2] + length),
+        // left portion
+        vec3(start[0] + (2*width/3), height, start[2] + length),
+        vec3(start[0] + width, height, start[2] + length),
+        vec3(start[0] + (2*width/3), 0, start[2] + length),
+        vec3(start[0] + width, 0, start[2] + length),
+        // upper portion of door
+        vec3(start[0], height, start[2] + length),
+        vec3(start[0] + width, height, start[2] + length),
+        vec3(start[0], (3*height/4), start[2] + length),
+        vec3(start[0] + width, (3*height/4), start[2] + length),
+        // door
+        vec3(start[0], (3*height/4), start[2] + length),
+        vec3(start[0] + width, (3*height/4), start[2] + length),
+        vec3(start[0], 0, start[2] + length),
+        vec3(start[0] + width, 0, start[2] + length),
+    ];
+    backSide = [
+        vec3(start[0], height, start[2]),
+        vec3(start[0], height, start[2] + length),
+        vec3(start[0], 0, start[2]),
+        vec3(start[0], 0, start[2] + length),
+    ];
+    frontSide = [
+        // left portion
+        vec3(start[0] + width, height, start[2]),
+        vec3(start[0] + width, height, start[2] + length),
+        vec3(start[0] + width, 0, start[2]),
+        vec3(start[0] + width, 0, start[2] + length),
+    ];
+    if (dFWall) {
+        quad(frontSide, 2, 0, 1, 3, 0);
+    }
+    if (dBWall) {
+        quad(backSide, 2, 0, 1, 3, 0);
+    }
+    if (dLWall) {
+        quad(leftSide, 0, 1, 2, 3, 0);
+    }
+    if (dRWall) {
+        quad(rightSide, 2, 0, 1, 3, 0);
+        quad(rightSide, 6, 4, 5, 7, 0);
+        quad(rightSide, 10, 8, 9, 11, 0);
+        quad(rightSide, 14, 12, 13, 15, 2);
     }
     quad(basement, 2, 0, 1, 3, 1);
 }
@@ -378,9 +443,9 @@ function createRightRooms(floor) {
 function createLab(floor) {
     if (floor == 4) {
         // First three labs
-        createRoom(vec4(-150, 0, -550), 150, 125, 150, true, true, true, true);
-        createRoom(vec4(-25, 0, -550), 150, 125, 150, true, true, true, true);
-        createRoom(vec4(120, 0, -550), 150, 49, 150, true, true, true, true);
+        createRightDoorRoom(vec4(-150, 0, -600), 150, 125, 150, true, true, true, true);
+        createRightDoorRoom(vec4(-25, 0, -600), 150, 125, 150, true, true, true, true);
+        createRightDoorRoom(vec4(120, 0, -600), 150, 49, 150, true, true, true, true);
 
         // 2nd from last two labs
         createRoom(vec4(0, 0, 125), 75, -100, 150, true, true, true, true);
@@ -400,9 +465,9 @@ function createLab(floor) {
     }
     if (floor == 3) {
         // First three labs
-        createRoom(vec4(-150, 0, -550), 150, 125, 150, true, true, true, true);
-        createRoom(vec4(-25, 0, -550), 150, 125, 150, true, true, true, true);
-        createRoom(vec4(120, 0, -550), 150, 49, 150, true, true, true, true);
+        createRightDoorRoom(vec4(-150, 0, -600), 150, 125, 150, true, true, true, true);
+        createRightDoorRoom(vec4(-25, 0, -600), 150, 125, 150, true, true, true, true);
+        createRightDoorRoom(vec4(120, 0, -600), 150, 49, 150, true, true, true, true);
 
         // 2nd from last two labs
         createRoom(vec4(0, 0, 125), 75, -100, 150, true, true, true, true);
@@ -751,13 +816,30 @@ function handleKeys() {
 
     var motion = vec3(leftright * speed, viewheight - eye[1], forwardback * speed);
     var motionDirected = multMV(transpose(direction), motion);
-    eye = add(eye, vec3(motionDirected));
-    at = add(at, vec3(motionDirected));
+    if (checkPosition(eye, vec3(motionDirected))) {
+        eye = add(eye, vec3(motionDirected));
+        at = add(at, vec3(motionDirected));
+    }
 
     // detect edge
     //console.log(motion);
     //console.log(motionDirected);
 
+}
+function checkPosition(currentPosition, additional) {
+    if (((currentPosition[0] + additional[0])>-150 && (currentPosition[0] + additional[0])<-100) ||
+        ((currentPosition[0] + additional[0])<150 && (currentPosition[0] + additional[0])>100)){
+        if ((currentPosition[2] + additional[2])>-450 && (currentPosition[2] + additional[2])<449) {
+            return true;
+        }
+    }
+    if (((currentPosition[2] + additional[2])>-449 && (currentPosition[2] + additional[2])<-401) ||
+        ((currentPosition[2] + additional[2])<449 && (currentPosition[2] + additional[2])>401)){
+        if ((currentPosition[0] + additional[0])>-150 && (currentPosition[0] + additional[0])<150) {
+            return true;
+        }
+    }
+    return false;
 }
 
 var mouseX = null;
