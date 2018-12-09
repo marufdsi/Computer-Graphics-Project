@@ -101,7 +101,7 @@ var modelView, projection;
 
 var personheight = 100;
 var up = vec3(0.0, -1.0, 0.0);
-var eye = vec3(-125, personheight, -401); // Initial at left corridor, better at elevator
+var eye = vec3(-125, personheight, -300); // Initial at left corridor, better at elevator
 var at = vec3(-125, personheight, 0);
 
 var speed = 0.5;
@@ -452,12 +452,6 @@ function getProjection() {
   return mult(N1, N2);
 }
 
-var pointsArray = [walls, doors, carpet];
-var texturesArray = [textureArrayWall, textureArrayDoor, textureArrayFloor];
-var vBuffers = [];
-var tBuffers = [];
-var vPosition;
-var vTexture;
 var uSampler;
 
 window.onload = function init() {
@@ -493,31 +487,31 @@ window.onload = function init() {
   gl.vertexAttribPointer(vNormal, 3, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(vNormal);
 
-  for (var i = 0; i < 3; i++) {
-    vBuffers[i] = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vBuffers[i]);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(pointsArray[i]), gl.STATIC_DRAW);
-    tBuffers[i] = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, tBuffers[i]);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(texturesArray[i]), gl.STATIC_DRAW);
-  }
+  var vBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, flatten(walls.concat(doors).concat(carpet)), gl.STATIC_DRAW);
 
-  vPosition = gl.getAttribLocation(program, "vPosition");
+  var vPosition = gl.getAttribLocation(program, "vPosition");
   gl.enableVertexAttribArray(vPosition);
+  gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0);
 
-  vTexture = gl.getAttribLocation(program, "aTextureCoord");
-  gl.enableVertexAttribArray(vTexture);
+  var tBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, tBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, flatten(textureArrayWall.concat(textureArrayDoor).concat(textureArrayFloor)), gl.STATIC_DRAW);
+
+  var tTexture = gl.getAttribLocation(program, "aTextureCoord");
+  gl.enableVertexAttribArray(tTexture);
+  gl.vertexAttribPointer(tTexture, 2, gl.FLOAT, false, 0, 0);
 
   modelView = gl.getUniformLocation(program, "modelView");
   projection = gl.getUniformLocation(program, "projection");
   uSampler = gl.getUniformLocation(program, "uSampler"); // buttons for viewing parameters
 
   var useLighting = gl.getUniformLocation(program, "uUseLighting"); // buttons for viewing parameters
-  gl.uniform1i(useLighting, 1);
+  gl.uniform1i(useLighting, 0);
 
   var useTexture = gl.getUniformLocation(program, "uUseTextureF"); // buttons for viewing parameters
   gl.uniform1i(useTexture, 1);
-
 
 
   document.onkeydown = handleKeyDown;
@@ -563,26 +557,28 @@ var render = function() {
   gl.uniformMatrix4fv(modelView, false, flatten(m_Camera));
   gl.uniformMatrix4fv(projection, false, flatten(m_P));
 
-  for (var i = 0; i < 3; i++) {
-    lightAmbient = vec4(0.2, 0.2, 0.2, 1.0);
-    ambientProduct = mult(lightAmbient, materialAmbient);
-    gl.uniform4fv(gl.getUniformLocation(program, "ambientProduct"), flatten(ambientProduct));
+
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, textures[1]);
+  gl.uniform1i(uSampler, 0);
+  gl.drawArrays(gl.TRIANGLES, walls.length, doors.length); //door
 
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, vBuffers[i]);
-    gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0);
-    gl.bindBuffer(gl.ARRAY_BUFFER, tBuffers[i]);
-    gl.vertexAttribPointer(vTexture, 2, gl.FLOAT, false, 0, 0);
+  lightAmbient = vec4(0.2, 0.2, 0.2, 1.0);
+  ambientProduct = mult(lightAmbient, materialAmbient);
+  gl.uniform4fv(gl.getUniformLocation(program, "ambientProduct"), flatten(ambientProduct));
 
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, textures[i]);
-    gl.uniform1i(uSampler, 0);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, textures[0]);
+  gl.uniform1i(uSampler, 0);
+  gl.drawArrays(gl.TRIANGLES, 0, walls.length);// wall
 
-    gl.drawArrays(gl.TRIANGLES, 0, pointsArray[i].length);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, textures[2]);
+  gl.uniform1i(uSampler, 0);
+  gl.drawArrays(gl.TRIANGLES, walls.length+doors.length, carpet.length); // carpet
 
 
-
-  }
 
   requestAnimFrame(render);
 }
