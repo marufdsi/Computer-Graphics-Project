@@ -207,14 +207,46 @@ function convertToNDC(object) {
     return result;
 }
 
-function makeCeiling() {
-    ceiling = [
+function makeCeilingAndBorder() {
+    var ceiling = [
         vec3(-250, 150, 450),
         vec3(250, 150, 450),
         vec3(-250, 150, -450),
         vec3(250, 150, -450),
     ];
     quad(ceiling, 2, 0, 1, 3, 0);
+    var border = [
+        vec3(-250, 150, 450),
+        vec3(250, 150, 450),
+        vec3(-250, 0, 450),
+        vec3(250, 0, 450),
+
+        vec3(-250, 150, 450),
+        vec3(-250, 150, -450),
+        vec3(-250, 0, -450),
+        vec3(-250, 0, 450),
+
+        vec3(250, 150, 450),
+        vec3(250, 150, -450),
+        vec3(250, 0, -450),
+        vec3(250, 0, 450),
+
+        vec3(-250, 150, -450),
+        vec3(250, 150, -450),
+        vec3(-250, 0, -450),
+        vec3(250, 0, -450),
+    ];
+    quad(border, 0, 1, 2, 3, 0);
+    quad(border, 4, 5, 6, 7, 0);
+    quad(border, 8, 9, 10, 11, 0);
+    quad(border, 12, 13, 14, 15, 0);
+    var base = [
+        vec3(-250, 0, 450),
+        vec3(250, 0, 450),
+        vec3(-250, 0, -450),
+        vec3(250, 0, -450),
+    ];
+    quad(base, 2, 0, 1, 3, 1);
 }
 
 function quad(object, a, b, c, d, element) {
@@ -336,7 +368,7 @@ function createLab(floor) {
         createRoom(vec4(-100, 0, -400), 200, 100, 150, true, true, true, true);
         createRoom(vec4(100, 0, -400), 100, -100, 150, true, true, false, true);
         createRoom(vec4(100, 0, -300), 100, -100, 150, false, true, false, true);
-        
+
         // Stairs
         createRoom(vec4(-100, 0, -35), 70, 75, 150, true, true, true, true);
         createRoom(vec4(-25, 0, -35), 70, 125, 150, true, true, true, true);
@@ -486,6 +518,7 @@ window.onload = function init() {
     createRightRooms(4);
     createRestroom(4);
     cooridors(4);
+    makeCeilingAndBorder();
 
     var nBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
