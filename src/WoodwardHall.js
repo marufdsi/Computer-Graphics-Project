@@ -763,37 +763,6 @@ function moveDirection(xzA, yzA) {
 }
 
 var textures = [];
-/*
-function initTextures() {
-  for(var i=0;i<3;i++){}
-  var i = 1;
-  textures[1] = gl.createTexture();
-  textures[1].image = new Image();
-  textures[1].image.onload = function() {
-    loadTexture(textures[i])
-  }
-  textures[1].image.src = IMAGES[0];
-
-  var j = 0;
-  i=1;
-  textures[0] = gl.createTexture();
-  textures[0].image = new Image();
-  textures[0].image.onload = function() {
-    loadTexture(textures[i])
-  }
-  textures[0].image.src = IMAGES[1];
-
-}
-
-function loadTexture(texture) {
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-  gl.generateMipmap(gl.TEXTURE_2D); //tell WebGL to generate the mipmap
-  gl.bindTexture(gl.TEXTURE_2D, null);
-}*/
 
 function initTextures(callback, args) {
   var promises = [];

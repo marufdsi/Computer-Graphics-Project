@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6f138c17-f71d-473f-9469-43427fca786f" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/WoodwardHall.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/WoodwardHall.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -28,13 +27,13 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="html" value="143" />
-          <entry key="js" value="2984" />
+          <entry key="js" value="3098" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="HTML" value="143" />
-          <entry key="JavaScript" value="2984" />
+          <entry key="JavaScript" value="3098" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -57,13 +56,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/WoodwardHall.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="158">
-              <caret line="80" column="45" lean-forward="true" selection-start-line="80" selection-start-column="45" selection-end-line="80" selection-end-column="45" />
-              <folding>
-                <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#label#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
-              </folding>
+            <state relative-caret-position="808">
+              <caret line="106" column="45" lean-forward="true" selection-start-line="106" selection-start-column="45" selection-end-line="106" selection-end-column="45" />
             </state>
           </provider>
         </entry>
@@ -71,8 +65,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/WoodwardHall.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="225">
-              <caret line="492" column="66" lean-forward="true" selection-start-line="492" selection-start-column="66" selection-end-line="492" selection-end-column="66" />
+            <state relative-caret-position="-1939">
+              <caret line="251" column="9" selection-start-line="251" selection-start-column="9" selection-end-line="251" selection-end-column="9" />
             </state>
           </provider>
         </entry>
@@ -102,11 +96,12 @@
       <find>DEPTH_BUFFER_BIT</find>
       <find>pointsArray</find>
       <find>, 1.0</find>
-      <find>makeCeiling</find>
       <find>normal</find>
       <find>shininess</find>
       <find>camer</find>
       <find>fovy</find>
+      <find>makeCeiling</find>
+      <find>makece</find>
     </findStrings>
     <replaceStrings>
       <replace>color</replace>
@@ -194,12 +189,12 @@
       <workItem from="1543779480555" duration="10761000" />
       <workItem from="1543811820036" duration="6890000" />
       <workItem from="1543876924976" duration="3449000" />
-      <workItem from="1544214968247" duration="40083000" />
+      <workItem from="1544214968247" duration="43827000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="61183000" />
+    <option name="totallyTimeSpent" value="64927000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1295" height="695" extended-state="6" />
@@ -259,20 +254,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/WoodwardHall.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="158">
-          <caret line="80" column="45" lean-forward="true" selection-start-line="80" selection-start-column="45" selection-end-line="80" selection-end-column="45" />
-          <folding>
-            <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#label#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
-          </folding>
+        <state relative-caret-position="808">
+          <caret line="106" column="45" lean-forward="true" selection-start-line="106" selection-start-column="45" selection-end-line="106" selection-end-column="45" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/WoodwardHall.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="492" column="66" lean-forward="true" selection-start-line="492" selection-start-column="66" selection-end-line="492" selection-end-column="66" />
+        <state relative-caret-position="-1939">
+          <caret line="251" column="9" selection-start-line="251" selection-start-column="9" selection-end-line="251" selection-end-column="9" />
         </state>
       </provider>
     </entry>
