@@ -6,11 +6,15 @@ var NumVertices = 36;
 var walls = [];
 var carpet = [];
 var doors = [];
+var eledoors3 = [];
+var eledoors4 = [];
 var normalsArray = [];
 
 var textureArrayFloor = [];
 var textureArrayWall = [];
 var textureArrayDoor = [];
+var textureArrayeleDoor3 = [];
+var textureArrayeleDoor4 = [];
 
 var textureUnit = [
   vec2(0, 1),
@@ -36,19 +40,21 @@ var IMAGES = [
   "wall.jpg",
   "door.jpg",
   "carpet.jpg",
+  "elevator3.png",
+  "elevator4.png",
 ];
 
 var leftCorridor = [
-    vec3(-150, 0, 450),
-    vec3(-100, 0.0, 450),
-    vec3(-150, 0.0, -450),
-    vec3(-100, 0.0, -450),
+  vec3(-150, 0, 450),
+  vec3(-100, 0.0, 450),
+  vec3(-150, 0.0, -450),
+  vec3(-100, 0.0, -450),
 ];
 var rightCorridor = [
-    vec3(150, 0.0, 450.0),
-    vec3(100, 0.0, 450.0),
-    vec3(150, 0.0, -450.0),
-    vec3(100, 0.0, -450.0),
+  vec3(150, 0.0, 450.0),
+  vec3(100, 0.0, 450.0),
+  vec3(150, 0.0, -450.0),
+  vec3(100, 0.0, -450.0),
 ];
 var frontCorridor = [
   vec3(-100, 0.0, -400.0),
@@ -93,18 +99,19 @@ var theta = 0.0;
 var phi = 0.0;
 var dr = 5.0 * Math.PI / 180.0;
 
-var fovy = 45.0; // Field-of-view in Y direction angle (in degrees)
+var fovy = 75.0; // Field-of-view in Y direction angle (in degrees)
 var aspect; // Viewport aspect ratio
 
 var mvMatrix, pMatrix;
 var modelView, projection;
 
-var personheight = 80;
-//var up = vec3(0.0, -1.0, 0.0);
-var up = vec3(0.0, 1.0, 0.0);
+var personheight = 65;
 
-var eye = vec3(125, -personheight, -300); // Initial at left corridor, better at elevator
-var at = vec3(125, -personheight, 0);
+
+var up = vec3(0.0, 1.0, 0.0);
+var eye = vec3(0, -personheight, -10); // Initial at  elevator
+var at = vec3(0, -personheight, 100);
+
 /*
 var eye = vec3(-125, 800, -300); // Initial at left corridor, better at elevator
 var at = vec3(-125, 200, -300);
@@ -207,69 +214,71 @@ function createRoom(start, length, width, height, dLWall, dRWall, dBWall, dFWall
 }
 
 function createRightDoorRoom(start, length, width, height, dLWall, dRWall, dBWall, dFWall) {
-    basement = [
-        vec3(start[0], 0.0, start[2] + length),
-        vec3(start[0] + width, 0.0, start[2] + length),
-        vec3(start[0], 0.0, start[2]),
-        vec3(start[0] + width, 0.0, start[2]),
-    ];
-    leftSide = [
-        vec3(start[0], height, start[2]),
-        vec3(start[0], 0, start[2]),
-        vec3(start[0] + width, 0, start[2]),
-        vec3(start[0] + width, height, start[2]),
-    ];
-    rightSide = [
-        //right potion
-        vec3(start[0], height, start[2] + length),
-        vec3(start[0] + (width/3), height, start[2] + length),
-        vec3(start[0], 0, start[2] + length),
-        vec3(start[0] + (width/3), 0, start[2] + length),
-        // left portion
-        vec3(start[0] + (2*width/3), height, start[2] + length),
-        vec3(start[0] + width, height, start[2] + length),
-        vec3(start[0] + (2*width/3), 0, start[2] + length),
-        vec3(start[0] + width, 0, start[2] + length),
-        // upper portion of door
-        vec3(start[0], height, start[2] + length),
-        vec3(start[0] + width, height, start[2] + length),
-        vec3(start[0], (3*height/4), start[2] + length),
-        vec3(start[0] + width, (3*height/4), start[2] + length),
-        // door
-        vec3(start[0], (3*height/4), start[2] + length),
-        vec3(start[0] + width, (3*height/4), start[2] + length),
-        vec3(start[0], 0, start[2] + length),
-        vec3(start[0] + width, 0, start[2] + length),
-    ];
-    backSide = [
-        vec3(start[0], height, start[2]),
-        vec3(start[0], height, start[2] + length),
-        vec3(start[0], 0, start[2]),
-        vec3(start[0], 0, start[2] + length),
-    ];
-    frontSide = [
-        // left portion
-        vec3(start[0] + width, height, start[2]),
-        vec3(start[0] + width, height, start[2] + length),
-        vec3(start[0] + width, 0, start[2]),
-        vec3(start[0] + width, 0, start[2] + length),
-    ];
-    if (dFWall) {
-        quad(frontSide, 2, 0, 1, 3, 0);
-    }
-    if (dBWall) {
-        quad(backSide, 2, 0, 1, 3, 0);
-    }
-    if (dLWall) {
-        quad(leftSide, 0, 1, 2, 3, 0);
-    }
-    if (dRWall) {
-        quad(rightSide, 2, 0, 1, 3, 0);
-        quad(rightSide, 6, 4, 5, 7, 0);
-        quad(rightSide, 10, 8, 9, 11, 0);
-        quad(rightSide, 14, 12, 13, 15, 2);
-    }
-    quad(basement, 2, 0, 1, 3, 1);
+  basement = [
+    vec3(start[0], 0.0, start[2] + length),
+    vec3(start[0] + width, 0.0, start[2] + length),
+    vec3(start[0], 0.0, start[2]),
+    vec3(start[0] + width, 0.0, start[2]),
+  ];
+  leftSide = [
+    vec3(start[0], height, start[2]),
+    vec3(start[0], 0, start[2]),
+    vec3(start[0] + width, 0, start[2]),
+    vec3(start[0] + width, height, start[2]),
+  ];
+  rightSide = [
+    //right potion
+    vec3(start[0], height, start[2] + length),
+    vec3(start[0] + (width / 3), height, start[2] + length),
+    vec3(start[0], 0, start[2] + length),
+    vec3(start[0] + (width / 3), 0, start[2] + length),
+    // left portion
+    vec3(start[0] + (2 * width / 3), height, start[2] + length),
+    vec3(start[0] + width, height, start[2] + length),
+    vec3(start[0] + (2 * width / 3), 0, start[2] + length),
+    vec3(start[0] + width, 0, start[2] + length),
+    // upper portion of door
+    vec3(start[0] + width / 3, height, start[2] + length),
+    vec3(start[0] + width / 3 * 2, height, start[2] + length),
+    vec3(start[0] + width / 3, (3 * height / 4), start[2] + length),
+    vec3(start[0] + width / 3 * 2, (3 * height / 4), start[2] + length),
+    // door
+    vec3(start[0] + width / 3, (3 * height / 4), start[2] + length),
+    vec3(start[0] + width / 3 * 2, (3 * height / 4), start[2] + length),
+    vec3(start[0] + width / 3, 0, start[2] + length),
+    vec3(start[0] + width / 3 * 2, 0, start[2] + length),
+
+
+  ];
+  backSide = [
+    vec3(start[0], height, start[2]),
+    vec3(start[0], height, start[2] + length),
+    vec3(start[0], 0, start[2]),
+    vec3(start[0], 0, start[2] + length),
+  ];
+  frontSide = [
+    // left portion
+    vec3(start[0] + width, height, start[2]),
+    vec3(start[0] + width, height, start[2] + length),
+    vec3(start[0] + width, 0, start[2]),
+    vec3(start[0] + width, 0, start[2] + length),
+  ];
+  if (dFWall) {
+    quad(frontSide, 2, 0, 1, 3, 0);
+  }
+  if (dBWall) {
+    quad(backSide, 2, 0, 1, 3, 0);
+  }
+  if (dLWall) {
+    quad(leftSide, 0, 1, 2, 3, 0);
+  }
+  if (dRWall) {
+    quad(rightSide, 2, 0, 1, 3, 0);
+    quad(rightSide, 6, 4, 5, 7, 0);
+    quad(rightSide, 10, 8, 9, 11, 0);
+    quad(rightSide, 14, 12, 13, 15, 2);
+  }
+  quad(basement, 2, 0, 1, 3, 1);
 }
 
 function convertToNDC(object) {
@@ -393,38 +402,80 @@ function quad(object, a, b, c, d, element) {
     textureArrayDoor.push(textureUnit[a]);
     textureArrayDoor.push(textureUnit[c]);
     textureArrayDoor.push(textureUnit[d]);
+  } else if (element == 4) {
+    eledoors3.push(object[a]);
+    normalsArray.push(normal);
+    eledoors3.push(object[b]);
+    normalsArray.push(normal);
+    eledoors3.push(object[c]);
+    normalsArray.push(normal);
+
+    eledoors3.push(object[a]);
+    normalsArray.push(normal);
+    eledoors3.push(object[c]);
+    normalsArray.push(normal);
+    eledoors3.push(object[d]);
+    normalsArray.push(normal);
+
+    textureArrayeleDoor3.push(textureUnit[a]);
+    textureArrayeleDoor3.push(textureUnit[b]);
+    textureArrayeleDoor3.push(textureUnit[c]);
+    textureArrayeleDoor3.push(textureUnit[a]);
+    textureArrayeleDoor3.push(textureUnit[c]);
+    textureArrayeleDoor3.push(textureUnit[d]);
+  } else if (element == 5) {
+    eledoors4.push(object[a]);
+    normalsArray.push(normal);
+    eledoors4.push(object[b]);
+    normalsArray.push(normal);
+    eledoors4.push(object[c]);
+    normalsArray.push(normal);
+
+    eledoors4.push(object[a]);
+    normalsArray.push(normal);
+    eledoors4.push(object[c]);
+    normalsArray.push(normal);
+    eledoors4.push(object[d]);
+    normalsArray.push(normal);
+
+    textureArrayeleDoor4.push(textureUnit[a]);
+    textureArrayeleDoor4.push(textureUnit[b]);
+    textureArrayeleDoor4.push(textureUnit[c]);
+    textureArrayeleDoor4.push(textureUnit[a]);
+    textureArrayeleDoor4.push(textureUnit[c]);
+    textureArrayeleDoor4.push(textureUnit[d]);
   }
 }
 
 
 function cooridors(floor) {
-    if (floor == 3 || floor == 4) {
-        quad(leftCorridor, 2, 0, 1, 3, 1);
-        quad(rightCorridor, 2, 0, 1, 3, 1);
-        quad(frontCorridor, 2, 0, 1, 3, 1);
-        quad(backCorridor, 2, 0, 1, 3, 1);
-    }
+  if (floor == 3 || floor == 4) {
+    quad(leftCorridor, 2, 0, 1, 3, 1);
+    quad(rightCorridor, 2, 0, 1, 3, 1);
+    quad(frontCorridor, 2, 0, 1, 3, 1);
+    quad(backCorridor, 2, 0, 1, 3, 1);
+  }
 }
 
 
 function createLeftRooms(floor) {
-    if (floor == 3 || floor == 4) {
-        createRoom(vec4(min_x, 0, -450), 2 * 50, 100, 150, true, false, true, true);
-        for (var i = 2; i < 8; i++) {
-            createRoom(vec4(min_x, 0, (-450 + (i * 50))), 50, 100, 150, true, true, true, true);
-        }
-        createRoom(vec4(min_x, 0, (-450 + (8 * 50))), 2 * 50, 100, 150, true, true, true, true);
-        for (var i = 10; i < 17; i++) {
-            createRoom(vec4(min_x, 0, (-450 + (i * 50))), 50, 100, 150, true, true, true, true);
-        }
-        createRoom(vec4(min_x, 0, (-450 + (17 * 50))), 50, 100, 150, true, true, true, true);
+  if (floor == 3 || floor == 4) {
+    createRoom(vec4(min_x, 0, -450), 2 * 50, 100, 150, true, false, true, true);
+    for (var i = 2; i < 8; i++) {
+      createRoom(vec4(min_x, 0, (-450 + (i * 50))), 50, 100, 150, true, true, true, true);
+    }
+    createRoom(vec4(min_x, 0, (-450 + (8 * 50))), 2 * 50, 100, 150, true, true, true, true);
+    for (var i = 10; i < 17; i++) {
+      createRoom(vec4(min_x, 0, (-450 + (i * 50))), 50, 100, 150, true, true, true, true);
     }
     createRoom(vec4(min_x, 0, (-450 + (17 * 50))), 50, 100, 150, true, true, true, true);
   }
+  createRoom(vec4(min_x, 0, (-450 + (17 * 50))), 50, 100, 150, true, true, true, true);
+}
 
 
 function createRightRooms(floor) {
-  if (floor == 4) {
+  if (floor == 3 || floor == 4) {
     createRoom(vec4(250, 0, -450), 2 * 50, -100, 150, true, true, true, true);
     for (var i = 2; i < 17; i++) {
       createRoom(vec4(250, 0, (-450 + (i * 50))), 50, -100, 150, true, true, true, true);
@@ -434,57 +485,117 @@ function createRightRooms(floor) {
 }
 
 function createLab(floor) {
-    if (floor == 4) {
-        // First three labs
-        createRightDoorRoom(vec4(-150, 0, -600), 150, 125, 150, true, true, true, true);
-        createRightDoorRoom(vec4(-25, 0, -600), 150, 125, 150, true, true, true, true);
-        createRightDoorRoom(vec4(120, 0, -600), 150, 49, 150, true, true, true, true);
+  if (floor == 4) {
+    // First three labs
+    createRightDoorRoom(vec4(-150, 0, -600), 150, 125, 150, true, true, true, true);
+    createRightDoorRoom(vec4(-25, 0, -600), 150, 125, 150, true, true, true, true);
+    createRightDoorRoom(vec4(120, 0, -600), 150, 49, 150, true, true, true, true);
 
-        // 2nd from last two labs
-        createRoom(vec4(0, 0, 125), 75, -100, 150, true, true, true, true);
-        createRoom(vec4(0, 0, 125), 75, 100, 150, true, true, true, true);
+    // 2nd from last two labs
+    createRoom(vec4(0, 0, 125), 75, -100, 150, true, true, true, true);
+    createRoom(vec4(0, 0, 125), 75, 100, 150, true, true, true, true);
 
-        // Last two labs
-        createRoom(vec4(0, 0, 200), 200, -100, 150, true, true, true, true);
-        createRoom(vec4(0, 0, 200), 200, 100, 150, true, true, true, true);
+    // Last two labs
+    createRoom(vec4(0, 0, 200), 200, -100, 150, true, true, true, true);
+    createRoom(vec4(0, 0, 200), 200, 100, 150, true, true, true, true);
 
-        // 2nd from first three labs
-        createRoom(vec4(0, 0, -400), 200, -100, 150, true, true, true, true);
-        createRoom(vec4(0, 0, -400), 100, 100, 150, true, true, false, true);
-        createRoom(vec4(0, 0, -300), 100, 100, 150, false, true, false, true);
-        // Stairs
-        createRoom(vec4(-25, 0, -35), 70, -75, 150, true, true, true, true);
-        createRoom(vec4(-25, 0, -35), 70, 125, 150, true, true, true, true);
-    }
-    if (floor == 3) {
-        // First three labs
-        createRightDoorRoom(vec4(-150, 0, -600), 150, 125, 150, true, true, true, true);
-        createRightDoorRoom(vec4(-25, 0, -600), 150, 125, 150, true, true, true, true);
-        createRightDoorRoom(vec4(120, 0, -600), 150, 49, 150, true, true, true, true);
+    // 2nd from first three labs
+    createRoom(vec4(0, 0, -400), 200, -100, 150, true, true, true, true);
+    createRoom(vec4(0, 0, -400), 100, 100, 150, true, true, false, true);
+    createRoom(vec4(0, 0, -300), 100, 100, 150, false, true, false, true);
+    // Stairs
+    //  createRoom(vec4(-25, 0, -35), 70, -75, 150, true, true, true, true);
+    //  createRoom(vec4(-25, 0, -35), 70, 125, 150, true, true, true, true);
+    createRightDoorRoom(vec4(25, 0, -75), 50, 60, 150, true, true, true, true);
+    createRightDoorRoom(vec4(25, 0, -25), -50, -110, 150, true, true, true, true);
+  }
+  if (floor == 3) {
+    // First three labs
+    createRightDoorRoom(vec4(-150, 0, -600), 150, 125, 150, true, true, true, true);
+    createRightDoorRoom(vec4(-25, 0, -600), 150, 125, 150, true, true, true, true);
+    createRightDoorRoom(vec4(120, 0, -600), 150, 49, 150, true, true, true, true);
 
-        // 2nd from last two labs
-        createRoom(vec4(0, 0, 125), 75, -100, 150, true, true, true, true);
-        createRoom(vec4(0, 0, 125), 75, 100, 150, true, true, true, true);
+    // 2nd from last two labs
+    createRoom(vec4(0, 0, 125), 75, -100, 150, true, true, true, true);
+    createRoom(vec4(0, 0, 125), 75, 100, 150, true, true, true, true);
 
-        // Last labs
-        createRoom(vec4(-100, 0, 200), 200, 200, 150, true, true, true, true);
+    // Last labs
+    createRoom(vec4(-100, 0, 200), 200, 200, 150, true, true, true, true);
 
-        // 2nd from first three labs
-        createRoom(vec4(0, 0, -400), 200, -100, 150, true, true, true, true);
-        createRoom(vec4(0, 0, -400), 100, 100, 150, true, true, false, true);
-        createRoom(vec4(0, 0, -300), 100, 100, 150, false, true, false, true);
-        // Stairs
-        createRoom(vec4(-25, 0, -35), 70, -75, 150, true, true, true, true);
-        createRoom(vec4(-25, 0, -35), 70, 125, 150, true, true, true, true);
-    }
-}
-
-function createRestroom(floor) {
-    if (floor == 3 || floor == 4) {
-
+    // 2nd from first three labs
+    createRoom(vec4(0, 0, -400), 200, -100, 150, true, true, true, true);
+    createRoom(vec4(0, 0, -400), 200, 100, 150, true, true, false, true);
+    //createRoom(vec4(0, 0, -300), 100, 100, 150, false, true, false, true);
+    // Stairs
+    //  createRoom(vec4(-25, 0, -35), 70, -75, 150, true, true, true, true);
+    //  createRoom(vec4(-25, 0, -35), 70, 125, 150, true, true, true, true);
+    createRightDoorRoom(vec4(25, 0, -75), 50, 60, 150, true, true, true, true);
+    createRightDoorRoom(vec4(25, 0, -25), -50, -110, 150, true, true, true, true);
   }
 }
 
+function createRestroom(floor) {
+  if (floor == 3 || floor == 4) {
+    createRoom(vec4(-100, 0, -200), 50, 50, 150, false, true, true, true);
+    createRoom(vec4(100, 0, -200), 50, -50, 150, false, true, true, true);
+  }
+}
+
+function createElevator(floor) {
+
+
+  var length = -40;
+  var start = vec4(100, 0, 125);
+  var width = -200;
+  var height = 150;
+
+  if (floor == 3 || floor == 4) {
+    //createRightDoorRoom(vec4(100, 0, 125), -40, -200, 150, true, true, true, true);
+
+    rightSide = [
+      //right potion
+      vec3(start[0], height, start[2] + length),
+      vec3(start[0] + (width / 3), height, start[2] + length),
+      vec3(start[0], 0, start[2] + length),
+      vec3(start[0] + (width / 3), 0, start[2] + length),
+      // left portion
+      vec3(start[0] + (2 * width / 3), height, start[2] + length),
+      vec3(start[0] + width, height, start[2] + length),
+      vec3(start[0] + (2 * width / 3), 0, start[2] + length),
+      vec3(start[0] + width, 0, start[2] + length),
+      // upper portion of door
+      vec3(start[0] + width / 3, height, start[2] + length),
+      vec3(start[0] + width / 3 * 2, height, start[2] + length),
+      vec3(start[0] + width / 3, 0, start[2] + length),
+      vec3(start[0] + width / 3 * 2, 0, start[2] + length)
+    ];
+    backSide = [
+      vec3(start[0], height, start[2]),
+      vec3(start[0], height, start[2] + length),
+      vec3(start[0], 0, start[2]),
+      vec3(start[0], 0, start[2] + length),
+    ];
+    frontSide = [
+      // left portion
+      vec3(start[0] + width, height, start[2]),
+      vec3(start[0] + width, height, start[2] + length),
+      vec3(start[0] + width, 0, start[2]),
+      vec3(start[0] + width, 0, start[2] + length),
+    ];
+
+    quad(frontSide, 2, 0, 1, 3, 0);
+    quad(backSide, 2, 0, 1, 3, 0);
+    quad(rightSide, 2, 0, 1, 3, 0);
+    quad(rightSide, 6, 4, 5, 7, 0);
+
+  }
+
+  if (floor == 3) {
+    quad(rightSide, 10, 8, 9, 11, 4);
+  } else if (floor == 4) {
+    quad(rightSide, 10, 8, 9, 11, 5);
+  }
+}
 
 var check_valid_up = function() {
   if (up[0] == 0 && up[1] == 0 && up[2] == 0) {
@@ -584,92 +695,98 @@ function getProjection() {
 var uSampler;
 
 window.onload = function init() {
-    canvas = document.getElementById("gl-canvas");
-    gl = WebGLUtils.setupWebGL(canvas);
-    if (!gl) {
-        alert("WebGL isn't available");
-    }
+  canvas = document.getElementById("gl-canvas");
+  gl = WebGLUtils.setupWebGL(canvas);
+  if (!gl) {
+    alert("WebGL isn't available");
+  }
 
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    aspect = canvas.width / canvas.height;
-    gl.clearColor(0.3, 0.1, 0.3, 1.0);
-    gl.enable(gl.DEPTH_TEST);
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  aspect = canvas.width / canvas.height;
+  gl.clearColor(0.3, 0.1, 0.3, 1.0);
+  gl.enable(gl.DEPTH_TEST);
 
-    //
-    //  Load shaders and initialize attribute buffers
-    //
-    program = initShaders(gl, "vertex-shader", "fragment-shader");
-    gl.useProgram(program);
-    initTextures(); //initTextures(draw);
+  //
+  //  Load shaders and initialize attribute buffers
+  //
+  program = initShaders(gl, "vertex-shader", "fragment-shader");
+  gl.useProgram(program);
+  initTextures(); //initTextures(draw);
 
-    loadFloor(selectedFloor);
+  loadFloor(selectedFloor);
 
-    modelView = gl.getUniformLocation(program, "modelView");
-    projection = gl.getUniformLocation(program, "projection");
-    uSampler = gl.getUniformLocation(program, "uSampler"); // buttons for viewing parameters
+  modelView = gl.getUniformLocation(program, "modelView");
+  projection = gl.getUniformLocation(program, "projection");
+  uSampler = gl.getUniformLocation(program, "uSampler"); // buttons for viewing parameters
 
-    var useLighting = gl.getUniformLocation(program, "uUseLighting"); // buttons for viewing parameters
-    gl.uniform1i(useLighting, 0);
+  var useLighting = gl.getUniformLocation(program, "uUseLighting"); // buttons for viewing parameters
+  gl.uniform1i(useLighting, 0);
 
-    var useTexture = gl.getUniformLocation(program, "uUseTextureF"); // buttons for viewing parameters
-    gl.uniform1i(useTexture, 1);
+  var useTexture = gl.getUniformLocation(program, "uUseTextureF"); // buttons for viewing parameters
+  gl.uniform1i(useTexture, 1);
 
 
-    document.onkeydown = handleKeyDown;
-    document.onkeyup = handleKeyUp;
-    canvas.onmousedown = canvasMouseDown;
-    document.onmouseup = handleMouseUp;
-    canvas.onmousemove = canvasMouseMove;
+  document.onkeydown = handleKeyDown;
+  document.onkeyup = handleKeyUp;
+  canvas.onmousedown = canvasMouseDown;
+  document.onmouseup = handleMouseUp;
+  canvas.onmousemove = canvasMouseMove;
 
-    document.getElementById("changeFloor").onchange = function () {
-        selectedFloor = parseInt(document.getElementById("changeFloor").value);
-        floorChanged = true;
-    };
+  /*
+      document.getElementById("changeFloor").onchange = function () {
+          selectedFloor = parseInt(document.getElementById("changeFloor").value);
+          floorChanged = true;
 
-    render();
+};  */
+
+  render();
 }
 
 function loadFloor(numberOfFloor) {
-    walls = [];
-    carpet = [];
-    doors = [];
-    normalsArray = [];
+  walls = [];
+  carpet = [];
+  doors = [];
+  normalsArray = [];
 
-    textureArrayFloor = [];
-    textureArrayWall = [];
-    textureArrayDoor = [];
+  textureArrayFloor = [];
+  textureArrayWall = [];
+  textureArrayDoor = [];
 
-    createLeftRooms(numberOfFloor);
-    createRightRooms(numberOfFloor);
-    createLab(numberOfFloor);
-    createRestroom(numberOfFloor);
-    cooridors(numberOfFloor);
-    // floors(numberOfFloor);
-    makeCeiling();
+  createLeftRooms(numberOfFloor);
+  createRightRooms(numberOfFloor);
+  createLab(numberOfFloor);
+  createRestroom(numberOfFloor);
+  createElevator(numberOfFloor);
+  cooridors(numberOfFloor);
+  // floors(numberOfFloor);
+  makeCeiling();
 
-    var nBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(normalsArray), gl.STATIC_DRAW);
+  var nBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, flatten(normalsArray), gl.STATIC_DRAW);
 
-    var vNormal = gl.getAttribLocation(program, "vNormal");
-    gl.vertexAttribPointer(vNormal, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(vNormal);
+  var vNormal = gl.getAttribLocation(program, "vNormal");
+  gl.vertexAttribPointer(vNormal, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(vNormal);
 
-    var vBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(walls.concat(doors).concat(carpet)), gl.STATIC_DRAW);
+  var allVertices = doors.concat(eledoors3).concat(eledoors4).concat(walls).concat(carpet);
+  var allTextures = textureArrayDoor.concat(textureArrayeleDoor3).concat(textureArrayeleDoor4).concat(textureArrayWall).concat(textureArrayFloor);
 
-    var vPosition = gl.getAttribLocation(program, "vPosition");
-    gl.enableVertexAttribArray(vPosition);
-    gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0);
+  var vBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, flatten(allVertices), gl.STATIC_DRAW);
 
-    var tBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, tBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(textureArrayWall.concat(textureArrayDoor).concat(textureArrayFloor)), gl.STATIC_DRAW);
+  var vPosition = gl.getAttribLocation(program, "vPosition");
+  gl.enableVertexAttribArray(vPosition);
+  gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0);
 
-    var tTexture = gl.getAttribLocation(program, "aTextureCoord");
-    gl.enableVertexAttribArray(tTexture);
-    gl.vertexAttribPointer(tTexture, 2, gl.FLOAT, false, 0, 0);
+  var tBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, tBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, flatten(allTextures), gl.STATIC_DRAW);
+
+  var tTexture = gl.getAttribLocation(program, "aTextureCoord");
+  gl.enableVertexAttribArray(tTexture);
+  gl.vertexAttribPointer(tTexture, 2, gl.FLOAT, false, 0, 0);
 
 }
 
@@ -677,18 +794,25 @@ var render = function() {
   gl.clearDepth(1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    if (floorChanged) {
-        loadFloor(selectedFloor);
-        floorChanged = false;
+  if (floorChanged) {
+    if (selectedFloor == 3) {
+      selectedFloor = 4;
+      eledoors3 = [];
+      textureArrayeleDoor3 = [];
+    } else if (selectedFloor == 4) {
+      selectedFloor = 3;
+      eledoors3 = [];
+      textureArrayeleDoor3 = [];
     }
-    handleKeys();
-    check_valid_up();
+    loadFloor(selectedFloor);
+    floorChanged = false;
+  }
+  document.getElementById("dispCurrentFloor").innerHTML = selectedFloor;
+  handleKeys();
+  check_valid_up();
 
-
-  var m_Camera = getCamera(eye, at, up);
-  var m_P = getProjection();
-
-
+  //var m_Camera = getCamera(eye, at, up);
+  //var m_P = getProjection();
   //mvMatrix = lookAt(eye, at, subtract(up, eye));
   mvMatrix = lookAt(eye, at, up);
   pMatrix = perspective(fovy, aspect, near, far);
@@ -716,23 +840,38 @@ var render = function() {
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, textures[1]);
   gl.uniform1i(uSampler, 0);
-  gl.drawArrays(gl.TRIANGLES, walls.length, doors.length); //door
+  gl.drawArrays(gl.TRIANGLES, 0, doors.length); //door
 
+  if (eledoors3.length > 0) {
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, textures[2]);
+    gl.uniform1i(uSampler, 0);
+    gl.drawArrays(gl.TRIANGLES, doors.length, eledoors3.length); //elev3
+  }
+  if (eledoors4.length > 0) {
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, textures[3]);
+    gl.uniform1i(uSampler, 0);
+    gl.drawArrays(gl.TRIANGLES, doors.length + eledoors3.length, eledoors4.length); //elev4
+  }
 
   lightAmbient = vec4(0.2, 0.2, 0.2, 1.0);
   ambientProduct = mult(lightAmbient, materialAmbient);
   gl.uniform4fv(gl.getUniformLocation(program, "ambientProduct"), flatten(ambientProduct));
 
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, textures[0]);
+  gl.uniform1i(uSampler, 0);
+  gl.drawArrays(gl.TRIANGLES, doors.length + eledoors3.length + eledoors4.length, walls.length); // wall
+
+  if (carpet.length > 0) {
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, textures[0]);
+    gl.bindTexture(gl.TEXTURE_2D, textures[4]);
     gl.uniform1i(uSampler, 0);
-    gl.drawArrays(gl.TRIANGLES, 0, walls.length);// wall
-    if (carpet.length>0) {
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, textures[2]);
-        gl.uniform1i(uSampler, 0);
-        gl.drawArrays(gl.TRIANGLES, walls.length + doors.length, carpet.length); // carpet
-    }
+    //  gl.drawArrays(gl.TRIANGLES, doors.length+eledoors3.length+eledoors4.length+walls.length, carpet.length); // carpet
+    gl.drawArrays(gl.TRIANGLES, doors.length + eledoors3.length + eledoors4.length + walls.length, carpet.length); // carpet
+  }
+
 
   requestAnimFrame(render);
 }
@@ -812,25 +951,35 @@ function handleKeys() {
   eye = add(eye, vec3(motionDirected));
   at = add(at, vec3(motionDirected));
 
+  if (eye[0] < 100 && eye[0] > -100 && eye[2] < 125 && eye[2] > 85) { //in elevator, change floor
+    floorChanged = true;
+    up = vec3(0.0, 1.0, 0.0);
+    eye = vec3(0, -personheight, 0); // Initial at left corridor, better at elevator
+    at = vec3(0, -personheight, 100);
+  }
+
+  //console.log(eye);
+
   // detect edge
   //console.log(motion);
   //console.log(motionDirected);
 
 }
+
 function checkPosition(currentPosition, additional) {
-    if (((currentPosition[0] + additional[0])>-150 && (currentPosition[0] + additional[0])<-100) ||
-        ((currentPosition[0] + additional[0])<150 && (currentPosition[0] + additional[0])>100)){
-        if ((currentPosition[2] + additional[2])>-450 && (currentPosition[2] + additional[2])<449) {
-            return true;
-        }
+  if (((currentPosition[0] + additional[0]) > -150 && (currentPosition[0] + additional[0]) < -100) ||
+    ((currentPosition[0] + additional[0]) < 150 && (currentPosition[0] + additional[0]) > 100)) {
+    if ((currentPosition[2] + additional[2]) > -450 && (currentPosition[2] + additional[2]) < 449) {
+      return true;
     }
-    if (((currentPosition[2] + additional[2])>-449 && (currentPosition[2] + additional[2])<-401) ||
-        ((currentPosition[2] + additional[2])<449 && (currentPosition[2] + additional[2])>401)){
-        if ((currentPosition[0] + additional[0])>-150 && (currentPosition[0] + additional[0])<150) {
-            return true;
-        }
+  }
+  if (((currentPosition[2] + additional[2]) > -449 && (currentPosition[2] + additional[2]) < -401) ||
+    ((currentPosition[2] + additional[2]) < 449 && (currentPosition[2] + additional[2]) > 401)) {
+    if ((currentPosition[0] + additional[0]) > -150 && (currentPosition[0] + additional[0]) < 150) {
+      return true;
     }
-    return false;
+  }
+  return false;
 }
 
 
@@ -845,25 +994,7 @@ function canvasMouseDown(event) { // change view direction
   var rect = canvas.getBoundingClientRect();
   lastX = event.clientX - rect.left;
   lastY = event.clientY - rect.top;
-  //lastX = mouseX;
-  //lastY = mouseY;
 
-  /*
-    var rect = canvas.getBoundingClientRect();
-    mouseX = event.clientX - rect.left;
-    mouseY = event.clientY - rect.top;
-    lastX = mouseX;
-    lastY = mouseY;
-
-    xzangle = xzangle + (mouseX - Math.floor(canvas.width / 2)) / Math.floor(canvas.width / 2) * 30 / 180 * Math.PI;
-    yzangle = yzangle + (Math.floor(canvas.height / 2) - mouseY) / Math.floor(canvas.height / 2) * 30 / 180 * Math.PI;
-
-    var angles = moveAt(xzangle, yzangle);
-    xzangle = angles[0];
-    yzangles = angles[1];
-    dirXZangle = xzangle;
-    dirYZangles = yzangle;
-  */
 }
 
 
@@ -886,8 +1017,9 @@ var lastY = 0;
 
 function canvasMouseMove(event) { // change walking direction
 
-console.log(yzangle)
-
+  //console.log(clicked);
+  //console.log('move    ',mouseDown);
+  //console.log('move click   ',clicked);
   var rect = canvas.getBoundingClientRect();
   var newX = event.clientX - rect.left - lastX;
   var newY = -(event.clientY - rect.top - lastY);
@@ -896,6 +1028,7 @@ console.log(yzangle)
 
   if (!mouseDown) {
     if (clicked) {
+
       xzangle = xzangle + newX / Math.floor(canvas.width / 2) * 30 / 180 * Math.PI;
       yzangle = yzangle + newY / Math.floor(canvas.height / 2) * 30 / 180 * Math.PI;
 
