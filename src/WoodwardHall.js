@@ -1036,7 +1036,8 @@ if(isRestrict){
     at = add(at, vec3(motionDirected));
   }
 
-  if (eye[0] < 100 && eye[0] > -100 && eye[2] < 125 && eye[2] > 85) { //in elevator, change floor
+  if ((eye[0] < 100 && eye[0] > -100 && eye[2] < 125 && eye[2] > 85) ||
+(eye[0] < 85 && eye[0] > -85 && eye[2] < -25 && eye[2] > -75) ) { //in elevator, change floor
     floorChanged = true;
     up = vec3(0.0, 1.0, 0.0);
     eye = vec3(0, personheight, 0); // Initial at left corridor, better at elevator

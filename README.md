@@ -2,7 +2,7 @@
 
 This project provides an interactive navigation of two floors of a building. 
 - Initial position is in front of elevator.
-- Walk inside elevator to switch floor.
+- Walk inside elevator or stair to switch floor. Since only two floors are modeled so far, the floors are directly switched.
 - WASD to move forward, left, backward, right
 - ER to change the motion speed, E: speeding, R: slowing down
 - CZ to Crouch or Prone, could see from different viewing position, SPACE to jump
@@ -14,7 +14,7 @@ Constructions:
 - Lighting includes ambient, diffuse, and specular 
 - Motion is enable by adjusting the eye position, at and up direction according to the walking direction and speed. 
 - 5 Textures are used for wall, carpet, door, and the two elevator doors. 
-- 
+- Walking restrictions are done by limiting the walking motion according to the eye position. 
 
 Updating:
 - Walking restrictions: user will not be allowed to walk through walls.
