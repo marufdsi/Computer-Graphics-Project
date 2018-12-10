@@ -427,6 +427,7 @@ function lookAt( eye, at, up )
 
     if ( equal(eye, at) ) {
         return mat4();
+        console.log('Equal eye and at');
     }
 
     var v = normalize( subtract(at, eye) );  // view direction vector

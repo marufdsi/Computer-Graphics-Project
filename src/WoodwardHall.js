@@ -99,7 +99,7 @@ var theta = 0.0;
 var phi = 0.0;
 var dr = 5.0 * Math.PI / 180.0;
 
-var fovy = 75.0; // Field-of-view in Y direction angle (in degrees)
+var fovy = 75.0; // Field-of-view in Y directionMat angle (in degrees)
 var aspect; // Viewport aspect ratio
 
 var mvMatrix, pMatrix;
@@ -109,8 +109,8 @@ var personheight = 65;
 
 
 var up = vec3(0.0, 1.0, 0.0);
-var eye = vec3(0, -personheight, -10); // Initial at  elevator
-var at = vec3(0, -personheight, 100);
+var eye = vec3(0, personheight, -10); // Initial at  elevator
+var at = vec3(0, personheight, 100);
 
 /*
 var eye = vec3(-125, 800, -300); // Initial at left corridor, better at elevator
@@ -506,8 +506,8 @@ function createLab(floor) {
     // Stairs
     //  createRoom(vec4(-25, 0, -35), 70, -75, 150, true, true, true, true);
     //  createRoom(vec4(-25, 0, -35), 70, 125, 150, true, true, true, true);
-    createRightDoorRoom(vec4(25, 0, -75), 50, 60, 150, true, true, true, true);
-    createRightDoorRoom(vec4(25, 0, -25), -50, -110, 150, true, true, true, true);
+    createRightDoorRoom(vec4(25, 0, -75), 50, 60, 150, true, true,false, true);
+    createRightDoorRoom(vec4(25, 0, -25), -50, -110, 150, true, true, false, true);
   }
   if (floor == 3) {
     // First three labs
@@ -529,8 +529,8 @@ function createLab(floor) {
     // Stairs
     //  createRoom(vec4(-25, 0, -35), 70, -75, 150, true, true, true, true);
     //  createRoom(vec4(-25, 0, -35), 70, 125, 150, true, true, true, true);
-    createRightDoorRoom(vec4(25, 0, -75), 50, 60, 150, true, true, true, true);
-    createRightDoorRoom(vec4(25, 0, -25), -50, -110, 150, true, true, true, true);
+    createRightDoorRoom(vec4(25, 0, -75), 50, 60, 150, true, true, false, true);
+    createRightDoorRoom(vec4(25, 0, -25), -50, -110, 150, true, true, false, true);
   }
 }
 
@@ -599,7 +599,7 @@ function createElevator(floor) {
 
 var check_valid_up = function() {
   if (up[0] == 0 && up[1] == 0 && up[2] == 0) {
-    // reset the up value, because all zero is not a valid up direction
+    // reset the up value, because all zero is not a valid up directionMat
     up = vec3(0, 1, 0);
   }
 }
@@ -636,7 +636,7 @@ function getRotation(eye, at, up) {
   while (equal(at, up)) {
     at[2] += 0.0001;
   }
-  var n = normalize(subtract(at, eye)); // view direction vector
+  var n = normalize(subtract(at, eye)); // view directionMat vector
   var u = normalize(cross(up, n)); // perpendicular vector
   var v = normalize(cross(n, u)); // "new" up vector
 
@@ -732,6 +732,8 @@ window.onload = function init() {
   document.onmouseup = handleMouseUp;
   canvas.onmousemove = canvasMouseMove;
 
+  document.getElementById("Restriction").onclick = walkRestriction;
+
   /*
       document.getElementById("changeFloor").onchange = function () {
           selectedFloor = parseInt(document.getElementById("changeFloor").value);
@@ -741,6 +743,7 @@ window.onload = function init() {
 
   render();
 }
+
 
 function loadFloor(numberOfFloor) {
   walls = [];
@@ -759,7 +762,8 @@ function loadFloor(numberOfFloor) {
   createElevator(numberOfFloor);
   cooridors(numberOfFloor);
   // floors(numberOfFloor);
-  makeCeiling();
+  console.log(viewfloorTop);
+  if (!viewfloorTop) makeCeiling();
 
   var nBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
@@ -801,8 +805,8 @@ var render = function() {
       textureArrayeleDoor3 = [];
     } else if (selectedFloor == 4) {
       selectedFloor = 3;
-      eledoors3 = [];
-      textureArrayeleDoor3 = [];
+      eledoors4 = [];
+      textureArrayeleDoor4 = [];
     }
     loadFloor(selectedFloor);
     floorChanged = false;
@@ -895,8 +899,79 @@ var viewheight = personheight;
 var jumptimer = 0;
 var walktimer = 0;
 var speedRate = 0;
+var viewfloorTop = false;
+var viewfloorBtm = false;
+var upsaved;
+var eyesaved;
+var atsaved;
+var personheightsaved;
+var directionMatsaved;
+var viewfloortimer0 = 0;
+var viewfloortimer1 = 0;
+var enableMove = true;
 
 function handleKeys() {
+  if (currentlyPressedKeys[70]) { // F, allow floor plan view
+    viewfloortimer0 = viewfloortimer0 + 1;
+    if (viewfloortimer0 > 10) {
+      if (!viewfloorTop) {
+        upsaved = up;
+        eyesaved = eye;
+        atsaved = at;
+        personheightsaved = personheight;
+        directionMatsaved = directionMat;
+
+        up = vec3(0.0, 0.0, 1.0);
+        eye = vec3(0, 1200, -10); // Initial at  elevator
+        at = vec3(0, 10, -10);
+        personheight = 1200;
+        directionMat = mat3(
+          [-1, 0, 0],
+          [0, 0, -1],
+          [0, -1, 0]);
+        viewfloorTop = true;
+        enableMove = false;
+      } else {
+        up = upsaved;
+        eye = eyesaved;
+        at = atsaved;
+        personheight = personheightsaved;
+        directionMat = directionMatsaved;
+        viewfloorTop = false;
+        enableMove = true;
+      }
+      viewfloortimer0 = 0;
+    }
+
+  }
+
+  if (currentlyPressedKeys[71]) { // F, allow floor plan view
+    viewfloortimer1 = viewfloortimer1 + 1;
+    if (viewfloortimer1 > 7) {
+      if (!viewfloorBtm) {
+        up = vec3(0.0, 0.0, -1.0);
+        eye = vec3(0, -1200, -10); // Initial at  elevator
+        at = vec3(0, 10, -10);
+        personheight = -1200;
+        directionMat = mat3(
+          [-1, 0, 0],
+          [0, 0, 1],
+          [0, 1, 0]);
+        viewfloorBtm = true;
+        enableMove = false;
+      } else {
+        up = upsaved;
+        eye = eyesaved;
+        at = atsaved;
+        personheight = personheightsaved;
+        directionMat = directionMatsaved;
+        viewfloorBtm = false;
+        enableMove = true;
+      }
+      viewfloortimer1 = 0;
+    }
+  }
+
   if (currentlyPressedKeys[65]) { // A, left
     leftright = -1;
   } else if (currentlyPressedKeys[68]) { // D, right
@@ -942,30 +1017,238 @@ function handleKeys() {
   if (speed > 5) speed = 5;
   if (speed < 0.05) speed = 0.05;
 
-
-  //at = add(at, vec3(leftright * speed, viewheight - eye[1], forwardback * speed));
-  //eye = add(eye, vec3(leftright * speed, viewheight - eye[1], forwardback * speed));
-
   var motion = vec3(leftright * speed, viewheight - eye[1], forwardback * speed);
-  var motionDirected = multMV(transpose(direction), motion);
-  eye = add(eye, vec3(motionDirected));
-  at = add(at, vec3(motionDirected));
+  var motionDirected = multMV(directionMat, motion);
+  neweye = add(eye, vec3(motionDirected));
+
+//  console.log(checkleftCorridor());
+if(isRestrict){
+  if (checkleftCorridor() || checkrightCorridor() || checkfrontCorridor() || checkbackCorridor() ||
+    checkcenterCorridors() || checkleftRooms() || checkRightRooms() || checkLabs() || checkrestrooms()) {
+    enableMove = true;
+  } else {
+    enableMove = false;
+  }
+}
+
+  if (enableMove) {
+    eye = neweye;
+    at = add(at, vec3(motionDirected));
+  }
 
   if (eye[0] < 100 && eye[0] > -100 && eye[2] < 125 && eye[2] > 85) { //in elevator, change floor
     floorChanged = true;
     up = vec3(0.0, 1.0, 0.0);
-    eye = vec3(0, -personheight, 0); // Initial at left corridor, better at elevator
-    at = vec3(0, -personheight, 100);
+    eye = vec3(0, personheight, 0); // Initial at left corridor, better at elevator
+    at = vec3(0, personheight, 100);
   }
-
-  //console.log(eye);
-
-  // detect edge
-  //console.log(motion);
-  //console.log(motionDirected);
 
 }
 
+var isRestrict = false;
+function walkRestriction(){
+  isRestrict = !isRestrict;
+}
+
+
+var clearance = 3;
+var neweye;
+
+function checkleftCorridor() {
+  if ((eye[0] > leftCorridor[0][0]) & (eye[0] < leftCorridor[1][0]) & (eye[2] < leftCorridor[0][2]) & (eye[2] > leftCorridor[2][2]) &
+    (neweye[2] <= leftCorridor[0][2] - clearance) & (neweye[2] >= leftCorridor[2][2] + clearance) & // end walls
+    !((neweye[0] <= leftCorridor[0][0] - clearance) & leftInrangeNX()) & // -x walls
+    !((neweye[0] >= leftCorridor[1][0] + clearance) & leftInrangePX(0)) // +x walls
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function leftInrangeNX() {
+  var inrange = false;
+  if ((eye[2] >= (-450) & eye[2] <= (-450 + 100 / 3)) || (eye[2] >= (-450 + 100 / 3 * 2) & eye[2] <= (-450 + 100 + 50 / 3))) {
+    inrange = true;
+  }
+
+  for (var i = 2; i < 7; i++) {
+    if (eye[2] >= (-450 + i * 50 + 50 / 3 * 2) & eye[2] <= (-450 + i * 50 + 50 + 50 / 3)) {
+      inrange = true;
+    }
+  }
+
+  if ((eye[2] >= (-450 + 7 * 50 + 50 / 3 * 2) & eye[2] <= (-450 + 7 * 50 + 50 + 100 / 3)) || (eye[2] >= (-450 + 7 * 50 + 50 + 100 / 3 * 2) & eye[2] <= (-450 + 7 * 50 + 50 + 100 + 50 / 3))) {
+    inrange = true;
+  }
+
+  for (var i = 9; i < 16; i++) {
+    if (eye[2] >= (-450 + i * 50 + 50 / 3 * 2) & eye[2] <= (-450 + i * 50 + 50 + 50 / 3)) {
+      inrange = true;
+    }
+  }
+  if (eye[2] >= (-450 + 16 * 50 + 50 / 3 * 2) & eye[2] <= (-450 + 16 * 50 + 50)) {
+    inrange = true;
+  }
+  return inrange;
+}
+
+function leftInrangePX(lr) {
+  var inrange = false;
+  if (!lr) {
+    if (eye[2] >= (-600) & eye[2] <= (-600 + 150)) {
+      inrange = true;
+    }
+    if ((eye[2] >= (125) & eye[2] <= (125 + 75 / 3)) || (eye[2] >= (-125 + 57 / 3 * 2) & eye[2] <= (-125 + 75))) {
+      inrange = true;
+    }
+    if ((eye[2] >= (200) & eye[2] <= (200 + 200 / 3)) || (eye[2] >= (200 + 200 / 3 * 2) & eye[2] <= (200 + 200))) {
+      inrange = true;
+    }
+    if ((eye[2] >= (-400) & eye[2] <= (-400 + 200 / 3)) || (eye[2] >= (-400 + 200 / 3 * 2) & eye[2] <= (-400 + 200))) {
+      inrange = true;
+    }
+    if (eye[2] >= (-75) & eye[2] <= (-75 + 50)) {
+      inrange = true;
+    }
+  } else {
+
+  }
+
+return inrange;
+}
+
+function checkrightCorridor() {
+  console.log(leftInrangePX(0));
+  if ((eye[0] <= rightCorridor[0][0]) & (eye[0] >= rightCorridor[1][0]) & (eye[2] <= rightCorridor[0][2]) & (eye[2] >= rightCorridor[2][2]) &
+    (neweye[2] <= rightCorridor[0][2] - clearance) & (neweye[2] >= rightCorridor[2][2] + clearance) & // end walls
+    !((neweye[0] >= rightCorridor[0][0] - clearance) & leftInrangePX(0)) & // -x walls
+    !((neweye[0] <= rightCorridor[1][0] + clearance) & leftInrangeNX()) // +x walls
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function checkfrontCorridor() {
+  if ((eye[0] >= frontCorridor[0][0]) & (eye[0] <= frontCorridor[1][0]) & (eye[2] <= frontCorridor[0][2]) & (eye[2] >= frontCorridor[2][2]) &
+    (neweye[0] >= frontCorridor[0][0] + clearance) & (neweye[0] <= frontCorridor[1][0] - clearance) & // end walls
+    !((neweye[2] >= frontCorridor[0][2] + clearance) & frontInrangeNZ()) &
+    !((neweye[2] <= frontCorridor[2][2] - clearance) & frontInrangePZ())
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
+function frontInrangeNZ(lr) {
+  var inrange = false;
+  if (eye[0] >= (-150) & eye[2] <= (-150 + 125 / 3)) {
+    inrange = true;
+  }
+  if (eye[0] >= (-150 + 125 / 3 * 2) & eye[2] <= (-25 + 125 / 3)) {
+    inrange = true;
+  }
+  if (eye[0] >= (-25 + 125 / 3 * 2) & eye[2] <= (120 + 49 / 3)) {
+    inrange = true;
+  }
+  if (eye[0] >= (120 + 49 / 3 * 2) & eye[2] <= (120 + 49)) {
+    inrange = true;
+  }
+  return inrange;
+}
+
+function frontInrangePZ(lr) {
+  var inrange = false;
+  if (eye[0] >= (-100) & eye[2] <= (-100 + 100 / 3)) {
+    inrange = true;
+  }
+  if (eye[0] >= (-100 + 100 / 3 * 2) & eye[2] <= (-100 + 100 / 3 * 4)) {
+    inrange = true;
+  }
+  if (eye[0] >= (-100 + 100 / 3 * 4) & eye[2] <= (100)) {
+    inrange = true;
+  }
+
+  return inrange;
+}
+
+function checkbackCorridor() {
+
+  if ((eye[0] >= backCorridor[0][0]) & (eye[0] <= backCorridor[1][0]) & (eye[2] >= backCorridor[0][2]) & (eye[2] <= backCorridor[2][2]) &
+    (neweye[0] >= backCorridor[0][0] + clearance) & (neweye[0] <= backCorridor[1][0] - clearance) & (neweye[2] <= backCorridor[2][2] - clearance) & // end walls
+    !((neweye[2] <= backCorridor[0][2] + clearance) & backInrangeNZ(selectedFloor) ) ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function backInrangeNZ(floor) {
+  var inrange = false;
+  if (floor == 3) {
+    if (eye[0] >= (-100) & eye[2] <= (200)) {
+      inrange = true;
+    }
+  };
+  if (floor == 4) {
+    if (eye[0] >= (-100) & eye[2] <= (-100 + 100 / 3)) {
+      inrange = true;
+    }
+    if (eye[0] >= (-100 + 100 / 3 * 2) & eye[2] <= (-100 + 100 / 3 * 4)) {
+      inrange = true;
+    }
+    if (eye[0] >= (-100 + 100 / 3 * 4) & eye[2] <= (100)) {
+      inrange = true;
+    }
+  }
+  return inrange;
+}
+
+function checkcenterCorridors() {
+//  console.log(eye);
+  console.log(neweye);
+
+  var iftrue = false;
+  if ((eye[0] >= -100) & (eye[0] <= 100) & (eye[2]>= -25) & (eye[2] <=125-40) &
+  !((neweye[2] >= 125-40 - clearance) & ((eye[0] > (-100)) & (eye[0] < (-100+200/3)) || (eye[0] > (-100+200/3*2)) & (eye[0] < 100)) ) &
+  !((neweye[2] <= -25 + clearance) &((eye[0] > (-100)) & (eye[0] < -80) || (eye[0] > -40) & (eye[0] < 100)))
+){
+      iftrue = true;
+  }
+
+  if ((eye[0] >= -100) & (eye[0] <= 100) & (eye[2]>= -150 ) & (eye[2] >=-75) &
+  !((neweye[2] >= -75 - clearance) & ((eye[0] > (-15)) & (eye[0] < (-15+60+110/3)) || (eye[0] > (-15+60+110/3*2)) & (eye[0] <-15+60+110)) ) &
+  !((neweye[2] <= -150 + clearance) &((eye[0] > (-100)) & (eye[0] < (-50)) || (eye[0] > (50)) & (eye[0] < 100))) &
+  !((neweye[2] <= -200 + clearance) &((eye[0] > (-25)) & (eye[0] < 25) ))
+){
+      iftrue = true;
+  }
+  return iftrue;
+
+}
+
+function checkleftRooms() {
+  return false;
+}
+
+function checkRightRooms() {
+  return false;
+}
+
+function checkLabs() {
+  return false;
+}
+
+function checkrestrooms() {
+  return false;
+}
+
+
+/*
 function checkPosition(currentPosition, additional) {
   if (((currentPosition[0] + additional[0]) > -150 && (currentPosition[0] + additional[0]) < -100) ||
     ((currentPosition[0] + additional[0]) < 150 && (currentPosition[0] + additional[0]) > 100)) {
@@ -981,14 +1264,14 @@ function checkPosition(currentPosition, additional) {
   }
   return false;
 }
-
+*/
 
 var xzangle = 0;
 var yzangle = 0;
 var mouseDown = false;
 var clicked = false;
 
-function canvasMouseDown(event) { // change view direction
+function canvasMouseDown(event) { // change view directionMat
   mouseDown = true;
   clicked = !clicked;
   var rect = canvas.getBoundingClientRect();
@@ -1005,7 +1288,7 @@ function handleMouseUp(event) {
   lastY = event.clientY - rect.top;
 }
 
-var direction = mat3(
+var directionMat = mat3(
   vec3(-1, 0, 0), //right
   vec3(0, 1, 0), //up
   vec3(0, 0, 1)
@@ -1017,9 +1300,6 @@ var lastY = 0;
 
 function canvasMouseMove(event) { // change walking direction
 
-  //console.log(clicked);
-  //console.log('move    ',mouseDown);
-  //console.log('move click   ',clicked);
   var rect = canvas.getBoundingClientRect();
   var newX = event.clientX - rect.left - lastX;
   var newY = -(event.clientY - rect.top - lastY);
@@ -1034,17 +1314,23 @@ function canvasMouseMove(event) { // change walking direction
 
       var angles = moveAt(xzangle, yzangle);
       xzangle = angles[0];
-      yzangles = angles[1];
+      yzangle = angles[1];
     }
   } else {
     clicked = false;
     xzangle = xzangle + newX / Math.floor(canvas.width / 2) * 30 / 180 * Math.PI;
     yzangle = yzangle + newY / Math.floor(canvas.height / 2) * 30 / 180 * Math.PI;
 
-    moveDirection(xzangle, yzangle);
+    //movedirectionMat(xzangle, yzangle);
     var angles = moveAt(xzangle, yzangle);
     xzangle = angles[0];
-    yzangles = angles[1];
+    yzangle = angles[1];
+
+    var n = lookAt(at, eye, up);
+    directionMat = mat3(vec3(normalize(subtract(vec3(0, 0, 0), n[0].slice(0, 3)))), vec3(up), vec3(normalize(subtract(at, eye))));
+    //  console.log(directionMat);
+
+
   }
 }
 
@@ -1059,40 +1345,13 @@ function moveAt(xzA, yzA) {
   var z = length(subtract(at, eye)) * Math.cos(yzA) * Math.cos(xzA);
 
 
-  //console.log('moveAt');
-  //console.log(xzA)
-  //console.log(yzA)
-  //console.log(x + ',  ' + y + ',  ' + z)
   at = add(eye, vec3(-x, y, z));
-  up = vec3(Math.cos(yzA - 1 / 2 * Math.PI) * Math.sin(xzA), -1 * Math.sin(yzA - 1 / 2 * Math.PI), Math.cos(yzA - 1 / 2 * Math.PI) * Math.cos(xzA));
-
-  //console.log(at)
-
-  return [xzA, yzA];
-}
-
-function moveDirection(xzA, yzA) {
-  if (xzA >= 2 * Math.PI) xzA = xzA - 2 * Math.PI;
-  if (xzA < 0) xzA = xzA + 2 * Math.PI;
-  if (yzA >= 2 * Math.PI) yzA = yzA - 2 * Math.PI;
-  if (yzA < 0) yzA = yzA + 2 * Math.PI;
-
-  /*
-    direction = mat3(
-      vec3(Math.cos(yzA) * Math.sin(xzA + Math.PI/2), Math.sin(yzA), Math.cos(yzA) * Math.cos(xzA + Math.PI/2)),
-      vec3(Math.cos(yzA + Math.PI/2) * Math.sin(xzA- Math.PI), Math.sin(yzA + Math.PI / 2), Math.cos(yzA + Math.PI/2) * Math.cos(xzA- Math.PI)),
-      vec3(Math.cos(yzA) * Math.sin(xzA), Math.sin(yzA), Math.cos(yzA) * Math.cos(xzA))
-    );
-    */
-  direction = mat3(
-    vec3(-Math.sin(xzA + Math.PI / 2), 0, Math.cos(xzA + Math.PI / 2)), // flipped due to csy mismatch
-    vec3(0, Math.sin(yzA + Math.PI / 2), Math.cos(yzA + Math.PI / 2)),
-    vec3(-Math.cos(yzA) * Math.sin(xzA), Math.sin(yzA), Math.cos(yzA) * Math.cos(xzA))
-  );
+  up = vec3(Math.sin(yzA) * Math.sin(xzA), Math.cos(yzA), -Math.sin(yzA) * Math.cos(xzA));
 
 
   return [xzA, yzA];
 }
+
 
 var textures = [];
 
