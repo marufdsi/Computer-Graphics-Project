@@ -1106,62 +1106,7 @@ var isRestrict = false;
 function walkRestriction() {
     isRestrict = !isRestrict;
 }
-
-
-var clearance = 3;
 var neweye;
-
-function leftInrangeNX() {
-    var inrange = false;
-    if ((eye[2] >= (-450) & eye[2] <= (-450 + 100 / 3)) || (eye[2] >= (-450 + 100 / 3 * 2) & eye[2] <= (-450 + 100 + 50 / 3))) {
-        inrange = true;
-    }
-
-    for (var i = 2; i < 7; i++) {
-        if (eye[2] >= (-450 + i * 50 + 50 / 3 * 2) & eye[2] <= (-450 + i * 50 + 50 + 50 / 3)) {
-            inrange = true;
-        }
-    }
-
-    if ((eye[2] >= (-450 + 7 * 50 + 50 / 3 * 2) & eye[2] <= (-450 + 7 * 50 + 50 + 100 / 3)) || (eye[2] >= (-450 + 7 * 50 + 50 + 100 / 3 * 2) & eye[2] <= (-450 + 7 * 50 + 50 + 100 + 50 / 3))) {
-        inrange = true;
-    }
-
-    for (var i = 9; i < 16; i++) {
-        if (eye[2] >= (-450 + i * 50 + 50 / 3 * 2) & eye[2] <= (-450 + i * 50 + 50 + 50 / 3)) {
-            inrange = true;
-        }
-    }
-    if (eye[2] >= (-450 + 16 * 50 + 50 / 3 * 2) & eye[2] <= (-450 + 16 * 50 + 50)) {
-        inrange = true;
-    }
-    return inrange;
-}
-
-function leftInrangePX(lr) {
-    var inrange = false;
-    if (!lr) {
-        if (eye[2] >= (-600) & eye[2] <= (-600 + 150)) {
-            inrange = true;
-        }
-        if ((eye[2] >= (125) & eye[2] <= (125 + 75 / 3)) || (eye[2] >= (-125 + 57 / 3 * 2) & eye[2] <= (-125 + 75))) {
-            inrange = true;
-        }
-        if ((eye[2] >= (200) & eye[2] <= (200 + 200 / 3)) || (eye[2] >= (200 + 200 / 3 * 2) & eye[2] <= (200 + 200))) {
-            inrange = true;
-        }
-        if ((eye[2] >= (-400) & eye[2] <= (-400 + 200 / 3)) || (eye[2] >= (-400 + 200 / 3 * 2) & eye[2] <= (-400 + 200))) {
-            inrange = true;
-        }
-        if (eye[2] >= (-75) & eye[2] <= (-75 + 50)) {
-            inrange = true;
-        }
-    } else {
-
-    }
-
-    return inrange;
-}
 
 var xzangle = 0;
 var yzangle = 0;
