@@ -18,6 +18,7 @@ var textureArrayeleDoor4 = [];
 
 var restrictedXArea = [];
 var restrictedZArea = [];
+var isDoor = false;
 
 var textureUnit = [
     vec2(0, 1),
@@ -201,8 +202,10 @@ function createRoom(start, length, width, height, createBase) {
     // Front Wall
     quad(frontSide, 2, 0, 1, 3, 0);
     quad(frontSide, 6, 4, 5, 7, 0);
+    isDoor = true;
     quad(frontSide, 10, 8, 9, 11, 0);
     quad(frontSide, 14, 12, 13, 15, 2);
+    isDoor = false;
     // Back Wall
     quad(backSide, 2, 0, 1, 3, 0);
     // Left Wall
@@ -274,8 +277,10 @@ function createRightDoorRoom(start, length, width, height, createBase) {
     // Right Wall
     quad(rightSide, 2, 0, 1, 3, 0);
     quad(rightSide, 6, 4, 5, 7, 0);
+    isDoor=true;
     quad(rightSide, 10, 8, 9, 11, 0);
     quad(rightSide, 14, 12, 13, 15, 2);
+    isDoor=false;
 
     if (createBase) {
         quad(basement, 2, 0, 1, 3, 1);
@@ -340,7 +345,6 @@ function makeCeiling() {
     quad(ceiling, 2, 0, 1, 3, 0);
     quad(ceiling, 6, 4, 5, 7, 0);
 }
-
 function quad(object, a, b, c, d, element) {
     var t1 = subtract(object[b], object[a]);
     var t2 = subtract(object[c], object[b]);
@@ -448,13 +452,31 @@ function quad(object, a, b, c, d, element) {
         eledoors4.push(object[d]);
         normalsArray.push(normal);
 
-    textureArrayeleDoor4.push(textureUnit[a]);
-    textureArrayeleDoor4.push(textureUnit[b]);
-    textureArrayeleDoor4.push(textureUnit[c]);
-    textureArrayeleDoor4.push(textureUnit[a]);
-    textureArrayeleDoor4.push(textureUnit[c]);
-    textureArrayeleDoor4.push(textureUnit[d]);
-  }
+        textureArrayeleDoor4.push(textureUnit[a]);
+        textureArrayeleDoor4.push(textureUnit[b]);
+        textureArrayeleDoor4.push(textureUnit[c]);
+        textureArrayeleDoor4.push(textureUnit[a]);
+        textureArrayeleDoor4.push(textureUnit[c]);
+        textureArrayeleDoor4.push(textureUnit[d]);
+    }
+
+    if (!isDoor && (object[a][1] != object[c][1])) {
+        if (object[a][0] == object[c][0]) {
+            restrictedXArea.push([object[a][0] - 1, object[a][0] + 1]);
+            if (object[a][2] < object[c][2]) {
+                restrictedZArea.push([object[a][2], object[c][2]]);
+            } else {
+                restrictedZArea.push([object[c][2], object[a][2]]);
+            }
+        } else if (object[a][2] == object[c][2]) {
+            restrictedZArea.push([object[a][2] - 1, object[a][2] + 1]);
+            if (object[a][0] < object[c][0]) {
+                restrictedXArea.push([object[a][0], object[c][0]]);
+            } else {
+                restrictedXArea.push([object[c][0], object[a][0]]);
+            }
+        }
+    }
 }
 
 
@@ -599,12 +621,13 @@ function createElevator(floor) {
         quad(rightSide, 6, 4, 5, 7, 0);
 
     }
-
+    isDoor = true;
     if (floor == 3) {
         quad(rightSide, 10, 8, 9, 11, 4);
     } else if (floor == 4) {
         quad(rightSide, 10, 8, 9, 11, 5);
     }
+    isDoor = false;
 }
 
 var check_valid_up = function () {
@@ -764,6 +787,9 @@ function loadFloor(numberOfFloor) {
     textureArrayFloor = [];
     textureArrayWall = [];
     textureArrayDoor = [];
+
+    restrictedXArea = [];
+    restrictedZArea = [];
 
     createLeftRooms(numberOfFloor);
     createRightRooms(numberOfFloor);
@@ -1033,16 +1059,19 @@ function handleKeys() {
     var motion = vec3(leftright * speed, viewheight - eye[1], forwardback * speed);
     var motionDirected = multMV(directionMat, motion);
     neweye = add(eye, vec3(motionDirected));
-
-//  console.log(checkleftCorridor());
-if(isRestrict){
-  if (checkleftCorridor() || checkrightCorridor() || checkfrontCorridor() || checkbackCorridor() ||
-    checkcenterCorridors() || checkleftRooms() || checkRightRooms() || checkLabs() || checkrestrooms()) {
-    enableMove = true;
-  } else {
-    enableMove = false;
-  }
-}
+    if (isRestrict) {
+        if (isInRestrictedArea()) {
+            enableMove = false;
+        } else {
+            enableMove = true;
+        }
+        /*if (checkleftCorridor() || checkrightCorridor() || checkfrontCorridor() || checkbackCorridor() ||
+          checkcenterCorridors() || checkleftRooms() || checkRightRooms() || checkLabs() || checkrestrooms()) {
+          enableMove = true;
+        } else {
+          enableMove = false;
+        }*/
+    }
 
     if (enableMove) {
         eye = neweye;
@@ -1059,226 +1088,80 @@ if(isRestrict){
 
 }
 
+function isInRestrictedArea() {
+    console.log("Check restriction");
+    for (var i = 0; i < restrictedXArea.length; i++) {
+        if (neweye[0] >= restrictedXArea[i][0] && neweye[0] <= restrictedXArea[i][1]){
+            if(neweye[2] >= restrictedZArea[i][0] && neweye[2] <= restrictedZArea[i][1]) {
+                console.log("Restricted area found");
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 var isRestrict = false;
-function walkRestriction(){
-  isRestrict = !isRestrict;
+
+function walkRestriction() {
+    isRestrict = !isRestrict;
 }
 
 
 var clearance = 3;
 var neweye;
 
-function checkleftCorridor() {
-  if ((eye[0] > leftCorridor[0][0]) & (eye[0] < leftCorridor[1][0]) & (eye[2] < leftCorridor[0][2]) & (eye[2] > leftCorridor[2][2]) &
-    (neweye[2] <= leftCorridor[0][2] - clearance) & (neweye[2] >= leftCorridor[2][2] + clearance) & // end walls
-    !((neweye[0] <= leftCorridor[0][0] - clearance) & leftInrangeNX()) & // -x walls
-    !((neweye[0] >= leftCorridor[1][0] + clearance) & leftInrangePX(0)) // +x walls
-  ) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
 function leftInrangeNX() {
-  var inrange = false;
-  if ((eye[2] >= (-450) & eye[2] <= (-450 + 100 / 3)) || (eye[2] >= (-450 + 100 / 3 * 2) & eye[2] <= (-450 + 100 + 50 / 3))) {
-    inrange = true;
-  }
-
-  for (var i = 2; i < 7; i++) {
-    if (eye[2] >= (-450 + i * 50 + 50 / 3 * 2) & eye[2] <= (-450 + i * 50 + 50 + 50 / 3)) {
-      inrange = true;
+    var inrange = false;
+    if ((eye[2] >= (-450) & eye[2] <= (-450 + 100 / 3)) || (eye[2] >= (-450 + 100 / 3 * 2) & eye[2] <= (-450 + 100 + 50 / 3))) {
+        inrange = true;
     }
-  }
 
-  if ((eye[2] >= (-450 + 7 * 50 + 50 / 3 * 2) & eye[2] <= (-450 + 7 * 50 + 50 + 100 / 3)) || (eye[2] >= (-450 + 7 * 50 + 50 + 100 / 3 * 2) & eye[2] <= (-450 + 7 * 50 + 50 + 100 + 50 / 3))) {
-    inrange = true;
-  }
-
-  for (var i = 9; i < 16; i++) {
-    if (eye[2] >= (-450 + i * 50 + 50 / 3 * 2) & eye[2] <= (-450 + i * 50 + 50 + 50 / 3)) {
-      inrange = true;
+    for (var i = 2; i < 7; i++) {
+        if (eye[2] >= (-450 + i * 50 + 50 / 3 * 2) & eye[2] <= (-450 + i * 50 + 50 + 50 / 3)) {
+            inrange = true;
+        }
     }
-  }
-  if (eye[2] >= (-450 + 16 * 50 + 50 / 3 * 2) & eye[2] <= (-450 + 16 * 50 + 50)) {
-    inrange = true;
-  }
-  return inrange;
+
+    if ((eye[2] >= (-450 + 7 * 50 + 50 / 3 * 2) & eye[2] <= (-450 + 7 * 50 + 50 + 100 / 3)) || (eye[2] >= (-450 + 7 * 50 + 50 + 100 / 3 * 2) & eye[2] <= (-450 + 7 * 50 + 50 + 100 + 50 / 3))) {
+        inrange = true;
+    }
+
+    for (var i = 9; i < 16; i++) {
+        if (eye[2] >= (-450 + i * 50 + 50 / 3 * 2) & eye[2] <= (-450 + i * 50 + 50 + 50 / 3)) {
+            inrange = true;
+        }
+    }
+    if (eye[2] >= (-450 + 16 * 50 + 50 / 3 * 2) & eye[2] <= (-450 + 16 * 50 + 50)) {
+        inrange = true;
+    }
+    return inrange;
 }
 
 function leftInrangePX(lr) {
-  var inrange = false;
-  if (!lr) {
-    if (eye[2] >= (-600) & eye[2] <= (-600 + 150)) {
-      inrange = true;
+    var inrange = false;
+    if (!lr) {
+        if (eye[2] >= (-600) & eye[2] <= (-600 + 150)) {
+            inrange = true;
+        }
+        if ((eye[2] >= (125) & eye[2] <= (125 + 75 / 3)) || (eye[2] >= (-125 + 57 / 3 * 2) & eye[2] <= (-125 + 75))) {
+            inrange = true;
+        }
+        if ((eye[2] >= (200) & eye[2] <= (200 + 200 / 3)) || (eye[2] >= (200 + 200 / 3 * 2) & eye[2] <= (200 + 200))) {
+            inrange = true;
+        }
+        if ((eye[2] >= (-400) & eye[2] <= (-400 + 200 / 3)) || (eye[2] >= (-400 + 200 / 3 * 2) & eye[2] <= (-400 + 200))) {
+            inrange = true;
+        }
+        if (eye[2] >= (-75) & eye[2] <= (-75 + 50)) {
+            inrange = true;
+        }
+    } else {
+
     }
-    if ((eye[2] >= (125) & eye[2] <= (125 + 75 / 3)) || (eye[2] >= (-125 + 57 / 3 * 2) & eye[2] <= (-125 + 75))) {
-      inrange = true;
-    }
-    if ((eye[2] >= (200) & eye[2] <= (200 + 200 / 3)) || (eye[2] >= (200 + 200 / 3 * 2) & eye[2] <= (200 + 200))) {
-      inrange = true;
-    }
-    if ((eye[2] >= (-400) & eye[2] <= (-400 + 200 / 3)) || (eye[2] >= (-400 + 200 / 3 * 2) & eye[2] <= (-400 + 200))) {
-      inrange = true;
-    }
-    if (eye[2] >= (-75) & eye[2] <= (-75 + 50)) {
-      inrange = true;
-    }
-  } else {
 
-  }
-
-return inrange;
+    return inrange;
 }
-
-function checkrightCorridor() {
-  console.log(leftInrangePX(0));
-  if ((eye[0] <= rightCorridor[0][0]) & (eye[0] >= rightCorridor[1][0]) & (eye[2] <= rightCorridor[0][2]) & (eye[2] >= rightCorridor[2][2]) &
-    (neweye[2] <= rightCorridor[0][2] - clearance) & (neweye[2] >= rightCorridor[2][2] + clearance) & // end walls
-    !((neweye[0] >= rightCorridor[0][0] - clearance) & leftInrangePX(0)) & // -x walls
-    !((neweye[0] <= rightCorridor[1][0] + clearance) & leftInrangeNX()) // +x walls
-  ) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
-function checkfrontCorridor() {
-  if ((eye[0] >= frontCorridor[0][0]) & (eye[0] <= frontCorridor[1][0]) & (eye[2] <= frontCorridor[0][2]) & (eye[2] >= frontCorridor[2][2]) &
-    (neweye[0] >= frontCorridor[0][0] + clearance) & (neweye[0] <= frontCorridor[1][0] - clearance) & // end walls
-    !((neweye[2] >= frontCorridor[0][2] + clearance) & frontInrangeNZ()) &
-    !((neweye[2] <= frontCorridor[2][2] - clearance) & frontInrangePZ())
-  ) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
-
-function frontInrangeNZ(lr) {
-  var inrange = false;
-  if (eye[0] >= (-150) & eye[2] <= (-150 + 125 / 3)) {
-    inrange = true;
-  }
-  if (eye[0] >= (-150 + 125 / 3 * 2) & eye[2] <= (-25 + 125 / 3)) {
-    inrange = true;
-  }
-  if (eye[0] >= (-25 + 125 / 3 * 2) & eye[2] <= (120 + 49 / 3)) {
-    inrange = true;
-  }
-  if (eye[0] >= (120 + 49 / 3 * 2) & eye[2] <= (120 + 49)) {
-    inrange = true;
-  }
-  return inrange;
-}
-
-function frontInrangePZ(lr) {
-  var inrange = false;
-  if (eye[0] >= (-100) & eye[2] <= (-100 + 100 / 3)) {
-    inrange = true;
-  }
-  if (eye[0] >= (-100 + 100 / 3 * 2) & eye[2] <= (-100 + 100 / 3 * 4)) {
-    inrange = true;
-  }
-  if (eye[0] >= (-100 + 100 / 3 * 4) & eye[2] <= (100)) {
-    inrange = true;
-  }
-
-  return inrange;
-}
-
-function checkbackCorridor() {
-
-  if ((eye[0] >= backCorridor[0][0]) & (eye[0] <= backCorridor[1][0]) & (eye[2] >= backCorridor[0][2]) & (eye[2] <= backCorridor[2][2]) &
-    (neweye[0] >= backCorridor[0][0] + clearance) & (neweye[0] <= backCorridor[1][0] - clearance) & (neweye[2] <= backCorridor[2][2] - clearance) & // end walls
-    !((neweye[2] <= backCorridor[0][2] + clearance) & backInrangeNZ(selectedFloor) ) ) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
-function backInrangeNZ(floor) {
-  var inrange = false;
-  if (floor == 3) {
-    if (eye[0] >= (-100) & eye[2] <= (200)) {
-      inrange = true;
-    }
-  };
-  if (floor == 4) {
-    if (eye[0] >= (-100) & eye[2] <= (-100 + 100 / 3)) {
-      inrange = true;
-    }
-    if (eye[0] >= (-100 + 100 / 3 * 2) & eye[2] <= (-100 + 100 / 3 * 4)) {
-      inrange = true;
-    }
-    if (eye[0] >= (-100 + 100 / 3 * 4) & eye[2] <= (100)) {
-      inrange = true;
-    }
-  }
-  return inrange;
-}
-
-function checkcenterCorridors() {
-//  console.log(eye);
-  console.log(neweye);
-
-  var iftrue = false;
-  if ((eye[0] >= -100) & (eye[0] <= 100) & (eye[2]>= -25) & (eye[2] <=125-40) &
-  !((neweye[2] >= 125-40 - clearance) & ((eye[0] > (-100)) & (eye[0] < (-100+200/3)) || (eye[0] > (-100+200/3*2)) & (eye[0] < 100)) ) &
-  !((neweye[2] <= -25 + clearance) &((eye[0] > (-100)) & (eye[0] < -80) || (eye[0] > -40) & (eye[0] < 100)))
-){
-      iftrue = true;
-  }
-
-  if ((eye[0] >= -100) & (eye[0] <= 100) & (eye[2]>= -150 ) & (eye[2] >=-75) &
-  !((neweye[2] >= -75 - clearance) & ((eye[0] > (-15)) & (eye[0] < (-15+60+110/3)) || (eye[0] > (-15+60+110/3*2)) & (eye[0] <-15+60+110)) ) &
-  !((neweye[2] <= -150 + clearance) &((eye[0] > (-100)) & (eye[0] < (-50)) || (eye[0] > (50)) & (eye[0] < 100))) &
-  !((neweye[2] <= -200 + clearance) &((eye[0] > (-25)) & (eye[0] < 25) ))
-){
-      iftrue = true;
-  }
-  return iftrue;
-
-}
-
-function checkleftRooms() {
-    return false;
-}
-
-function checkRightRooms() {
-    return false;
-}
-
-function checkLabs() {
-    return false;
-}
-
-function checkrestrooms() {
-    return false;
-}
-
-
-/*
-function checkPosition(currentPosition, additional) {
-  if (((currentPosition[0] + additional[0]) > -150 && (currentPosition[0] + additional[0]) < -100) ||
-    ((currentPosition[0] + additional[0]) < 150 && (currentPosition[0] + additional[0]) > 100)) {
-    if ((currentPosition[2] + additional[2]) > -450 && (currentPosition[2] + additional[2]) < 449) {
-      return true;
-    }
-  }
-  if (((currentPosition[2] + additional[2]) > -449 && (currentPosition[2] + additional[2]) < -401) ||
-    ((currentPosition[2] + additional[2]) < 449 && (currentPosition[2] + additional[2]) > 401)) {
-    if ((currentPosition[0] + additional[0]) > -150 && (currentPosition[0] + additional[0]) < 150) {
-      return true;
-    }
-  }
-  return false;
-}
-*/
 
 var xzangle = 0;
 var yzangle = 0;
